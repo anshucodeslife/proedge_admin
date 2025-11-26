@@ -1,0 +1,1034 @@
+{
+	"info": {
+		"_postman_id": "proedge-backend-collection-v2.1",
+		"name": "Proedge Backend API - Complete v2.1",
+		"description": "Complete API collection for Proedge LMS Backend with 65+ endpoints including notifications, Swagger docs, and all features",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"version": "2.1.0"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "student_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "course_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "notification_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.token) {",
+									"        pm.collectionVariables.set('auth_token', response.token);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"admin@proedge.com\",\"password\":\"admin123\"}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Verify Student ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"studentId\":\"STU0001\"}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/verify-student-id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"verify-student-id"
+							]
+						}
+					}
+				},
+				{
+					"name": "Signup with Student ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"studentId\":\"STU0001\",\"email\":\"new@test.com\",\"password\":\"pass123\"}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/signup-with-id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"signup-with-id"
+							]
+						}
+					}
+				},
+				{
+					"name": "Send OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"student1@proedge.com\"}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/send-otp",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"send-otp"
+							]
+						}
+					}
+				},
+				{
+					"name": "Verify OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"student1@proedge.com\",\"otpCode\":\"123456\"}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/verify-otp",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"verify-otp"
+							]
+						}
+					}
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"student1@proedge.com\",\"otpCode\":\"123456\",\"newPassword\":\"newpass123\"}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reset-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"reset-password"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Admin - Student Management",
+			"item": [
+				{
+					"name": "Create Student",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"new@test.com\",\"password\":\"pass123\",\"fullName\":\"New Student\",\"studentId\":\"STU0011\"}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/students",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"students"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Student",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"fullName\":\"Updated Name\"}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/students/{{student_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"students",
+								"{{student_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Assign to Course",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"courseId\":\"{{course_id}}\",\"batchId\":\"batch-id\"}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/students/{{student_id}}/assign-course",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"students",
+								"{{student_id}}",
+								"assign-course"
+							]
+						}
+					}
+				},
+				{
+					"name": "Bulk Upload CSV",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "POST",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/path/to/students.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/students/bulk-upload",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"students",
+								"bulk-upload"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Student - Course Access",
+			"item": [
+				{
+					"name": "Get Enrolled Courses",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/student/courses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"student",
+								"courses"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Course Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/student/courses/{{course_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"student",
+								"courses",
+								"{{course_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Course Modules",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/student/courses/{{course_id}}/modules",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"student",
+								"courses",
+								"{{course_id}}",
+								"modules"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Lesson with Video",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/student/lessons/lesson-id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"student",
+								"lessons",
+								"lesson-id"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Course Progress",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/student/courses/{{course_id}}/progress",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"student",
+								"courses",
+								"{{course_id}}",
+								"progress"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Courses",
+			"item": [
+				{
+					"name": "Get All Courses",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/courses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"courses"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Course",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"title\":\"New Course\",\"slug\":\"new-course\",\"price\":1999}"
+						},
+						"url": {
+							"raw": "{{base_url}}/courses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"courses"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. LMS",
+			"item": [
+				{
+					"name": "Create Module",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"title\":\"Module 1\",\"order\":1,\"courseId\":\"{{course_id}}\"}"
+						},
+						"url": {
+							"raw": "{{base_url}}/lms/modules",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lms",
+								"modules"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Lesson",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"title\":\"Lesson 1\",\"order\":1,\"moduleId\":\"module-id\",\"videoUrl\":\"s3://bucket/video.mp4\",\"durationSec\":600}"
+						},
+						"url": {
+							"raw": "{{base_url}}/lms/lessons",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lms",
+								"lessons"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Batches",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/lms/batches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lms",
+								"batches"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Enrollments",
+			"item": [
+				{
+					"name": "Enroll Student",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"courseId\":\"{{course_id}}\",\"batchId\":\"batch-id\"}"
+						},
+						"url": {
+							"raw": "{{base_url}}/enrollments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"enrollments"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Watch Log",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"lessonId\":\"lesson-id\",\"watchedSec\":450,\"lastPosition\":450,\"events\":{\"play\":[0],\"pause\":[450]}}"
+						},
+						"url": {
+							"raw": "{{base_url}}/enrollments/watchlogs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"enrollments",
+								"watchlogs"
+							]
+						},
+						"description": "Enhanced with events, percentage, auto-complete at 90%"
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Payments",
+			"item": [
+				{
+					"name": "Create Payment Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"courseId\":\"{{course_id}}\",\"amount\":1999}"
+						},
+						"url": {
+							"raw": "{{base_url}}/payments/order",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								"order"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "8. Upload",
+			"item": [
+				{
+					"name": "Get Upload URL",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"fileName\":\"video.mp4\",\"fileType\":\"video/mp4\"}"
+						},
+						"url": {
+							"raw": "{{base_url}}/upload/signed-url",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"upload",
+								"signed-url"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "9. Users",
+			"item": [
+				{
+					"name": "Get Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/users/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"profile"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "10. Admin Analytics",
+			"item": [
+				{
+					"name": "Get Overview Stats",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/admin/stats/overview",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"stats",
+								"overview"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "11. Notifications (NEW)",
+			"item": [
+				{
+					"name": "Send Notification (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"userId\":\"{{student_id}}\",\"type\":\"IN_APP\",\"title\":\"Test Notification\",\"message\":\"This is a test notification\"}"
+						},
+						"url": {
+							"raw": "{{base_url}}/notifications/send",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notifications",
+								"send"
+							]
+						},
+						"description": "Admin only - Send notification to user"
+					}
+				},
+				{
+					"name": "Get My Notifications",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/notifications?limit=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notifications"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Get notifications for logged-in user"
+					}
+				},
+				{
+					"name": "Mark as Read",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "PUT",
+						"url": {
+							"raw": "{{base_url}}/notifications/{{notification_id}}/read",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notifications",
+								"{{notification_id}}",
+								"read"
+							]
+						},
+						"description": "Mark notification as read"
+					}
+				},
+				{
+					"name": "Delete Notification (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}"
+								}
+							]
+						},
+						"method": "DELETE",
+						"url": {
+							"raw": "{{base_url}}/notifications/{{notification_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notifications",
+								"{{notification_id}}"
+							]
+						},
+						"description": "Admin only - Delete notification"
+					}
+				}
+			],
+			"description": "NEW: Notification system endpoints"
+		},
+		{
+			"name": "12. Documentation",
+			"item": [
+				{
+					"name": "Swagger UI",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api-docs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api-docs"
+							]
+						},
+						"description": "Access Swagger API documentation"
+					}
+				},
+				{
+					"name": "Swagger UI (Alt)",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/docs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"docs"
+							]
+						},
+						"description": "Alternative Swagger documentation route"
+					}
+				}
+			],
+			"description": "NEW: API Documentation endpoints"
+		}
+	]
+}

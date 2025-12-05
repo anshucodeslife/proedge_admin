@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { SelectField } from '../../components/ui/SelectField';
-import { enrollStudent } from '../../store/slices/enrollmentSlice';
+import { enrollStudent, fetchEnrollments, deleteEnrollment } from '../../store/slices/enrollmentSlice';
+import { fetchStudents } from '../../store/slices/studentSlice';
+import { fetchCourses } from '../../store/slices/courseSlice';
+import { fetchBatches } from '../../store/slices/batchSlice';
 import toast from 'react-hot-toast';
 
 export const EnrollmentList = () => {
@@ -15,6 +18,13 @@ export const EnrollmentList = () => {
   const courses = useSelector(state => state.courses.list);
   const batches = useSelector(state => state.batches.list);
   const dispatch = useDispatch();
+  
+  React.useEffect(() => {
+    dispatch(fetchEnrollments());
+    dispatch(fetchStudents());
+    dispatch(fetchBatches());
+    dispatch(fetchCourses());
+  }, [dispatch]);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ studentId: '', courseId: '', batchId: '' });
@@ -34,6 +44,12 @@ export const EnrollmentList = () => {
       toast.success('Student enrolled successfully');
       setIsModalOpen(false);
       setFormData({ studentId: '', courseId: '', batchId: '' });
+    }
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to unenroll this student?')) {
+      dispatch(deleteEnrollment(id));
     }
   };
 
@@ -57,6 +73,7 @@ export const EnrollmentList = () => {
                 <th className="px-6 py-4">Batch</th>
                 <th className="px-6 py-4">Date</th>
                 <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -67,6 +84,15 @@ export const EnrollmentList = () => {
                   <td className="px-6 py-4">{enrollment.batchName}</td>
                   <td className="px-6 py-4 text-slate-500">{enrollment.date}</td>
                   <td className="px-6 py-4"><Badge variant="primary">{enrollment.status}</Badge></td>
+                  <td className="px-6 py-4 text-right">
+                     <button 
+                        onClick={() => handleDelete(enrollment.id)}
+                        className="p-1 text-slate-400 hover:text-red-600 transition-colors"
+                        title="Unenroll"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

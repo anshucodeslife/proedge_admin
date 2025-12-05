@@ -1,10 +1,24 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { Trash2 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
+import { fetchPayments, deleteTransaction } from '../../store/slices/paymentSlice';
+import toast from 'react-hot-toast';
 
 export const Transactions = () => {
   const transactions = useSelector(state => state.payments.transactions);
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    dispatch(fetchPayments());
+  }, [dispatch]);
+
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete/void this transaction?')) {
+      dispatch(deleteTransaction(id));
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -24,6 +38,7 @@ export const Transactions = () => {
                 <th className="px-6 py-4">Amount</th>
                 <th className="px-6 py-4">Date</th>
                 <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -36,6 +51,15 @@ export const Transactions = () => {
                   <td className="px-6 py-4 text-slate-500">{txn.date}</td>
                   <td className="px-6 py-4">
                     <Badge variant={txn.status === 'Success' ? 'primary' : 'warning'}>{txn.status}</Badge>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <button 
+                      onClick={() => handleDelete(txn.id)}
+                      className="p-1 text-slate-400 hover:text-red-600 transition-colors"
+                      title="Delete/Void"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </td>
                 </tr>
               ))}

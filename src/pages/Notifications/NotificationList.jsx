@@ -6,12 +6,16 @@ import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { InputField } from '../../components/ui/InputField';
 import { SelectField } from '../../components/ui/SelectField';
-import { sendNotification, deleteNotification } from '../../store/slices/notificationSlice';
+import { sendNotification, deleteNotification, fetchNotifications } from '../../store/slices/notificationSlice';
 import toast from 'react-hot-toast';
 
 export const NotificationList = () => {
   const notifications = useSelector(state => state.notifications.list);
   const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    dispatch(fetchNotifications());
+  }, [dispatch]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ title: '', message: '', userId: '', type: 'IN_APP' });
 

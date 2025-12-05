@@ -1,21 +1,61 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '../../api/axios';
+import toast from 'react-hot-toast';
+
+export const fetchAttendance = createAsyncThunk(
+  'attendance/fetchAttendance',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/attendance');
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch attendance');
+    }
+  }
+);
+
+export const markAttendance = createAsyncThunk(
+  'attendance/markAttendance',
+  async (attendanceData, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/attendance', attendanceData);
+      toast.success('Attendance marked successfully');
+      return response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to mark attendance');
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
 
 const initialState = {
-  records: [
-    { id: 1, date: '2024-11-26', batch: 'Class 10-A', present: 28, absent: 4, status: 'Marked' },
-    { id: 2, date: '2024-11-25', batch: 'Class 10-A', present: 30, absent: 2, status: 'Marked' },
-  ],
+  records: [],
+  loading: false,
+  error: null,
 };
 
 const attendanceSlice = createSlice({
   name: 'attendance',
   initialState,
-  reducers: {
-    markAttendance: (state, action) => {
-      state.records.unshift({ ...action.payload, id: state.records.length + 1, status: 'Marked' });
-    },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchAttendance.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAttendance.fulfilled, (state, action) => {
+        state.loading = false;
+        state.records = action.payload;
+      })
+      .addCase(fetchAttendance.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(markAttendance.fulfilled, (state, action) => {
+        state.records.unshift({ ...action.payload, status: 'Marked' });
+      });
   },
 });
 
-export const { markAttendance } = attendanceSlice.actions;
 export default attendanceSlice.reducer;

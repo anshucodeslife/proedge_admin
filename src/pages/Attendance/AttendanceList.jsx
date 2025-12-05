@@ -1,12 +1,18 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Calendar, Upload } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
+import { fetchAttendance } from '../../store/slices/attendanceSlice';
 
 export const AttendanceList = () => {
   const records = useSelector(state => state.attendance.records);
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    dispatch(fetchAttendance());
+  }, [dispatch]);
 
   return (
     <div className="space-y-6">

@@ -1,21 +1,81 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '../../api/axios';
+import toast from 'react-hot-toast';
+
+export const fetchEnrollments = createAsyncThunk(
+  'enrollments/fetchEnrollments',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/enrollments');
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch enrollments');
+    }
+  }
+);
+
+export const enrollStudent = createAsyncThunk(
+  'enrollments/enrollStudent',
+  async (enrollmentData, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/enrollments', enrollmentData);
+      toast.success('Student enrolled successfully');
+      return response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to enroll student');
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
 
 const initialState = {
-  list: [
-    { id: 1, studentName: 'Alice Smith', courseName: 'Mathematics 101', batchName: 'Class 10-A', date: '2024-01-20', status: 'Active' },
-    { id: 2, studentName: 'Bob Jones', courseName: 'Physics 202', batchName: 'Class 9-B', date: '2024-02-05', status: 'Active' },
-  ],
+  list: [],
+  loading: false,
+  error: null,
 };
 
 const enrollmentSlice = createSlice({
   name: 'enrollments',
   initialState,
-  reducers: {
-    enrollStudent: (state, action) => {
-      state.list.push({ ...action.payload, id: state.list.length + 1, status: 'Active', date: new Date().toISOString().split('T')[0] });
-    },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      // Fetch Enrollments
+      .addCase(fetchEnrollments.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchEnrollments.fulfilled, (state, action) => {
+        state.loading = false;
+        state.list = action.payload;
+      })
+      .addCase(fetchEnrollments.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Enroll Student
+      .addCase(enrollStudent.fulfilled, (state, action) => {
+        state.list.push(action.payload);
+      })
+      // Delete Enrollment
+      .addCase(deleteEnrollment.fulfilled, (state, action) => {
+        state.list = state.list.filter(e => e.id !== action.payload);
+      });
   },
 });
 
-export const { enrollStudent } = enrollmentSlice.actions;
+export const deleteEnrollment = createAsyncThunk(
+  'enrollments/deleteEnrollment',
+  async (id, { rejectWithValue }) => {
+    try {
+      await api.delete(`/enrollments/${id}`);
+      toast.success('Enrollment deleted successfully');
+      return id;
+    } catch (error) {
+       toast.error(error.response?.data?.message || 'Failed to delete enrollment');
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
 export default enrollmentSlice.reducer;

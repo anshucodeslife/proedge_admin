@@ -1,31 +1,102 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '../../api/axios';
+import toast from 'react-hot-toast';
+
+export const fetchStudents = createAsyncThunk(
+  'students/fetchStudents',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/admin/students');
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch students');
+    }
+  }
+);
+
+export const addStudent = createAsyncThunk(
+  'students/addStudent',
+  async (studentData, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/admin/students', studentData);
+      toast.success('Student added successfully');
+      return response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to add student');
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const updateStudent = createAsyncThunk(
+  'students/updateStudent',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`/admin/students/${id}`, data);
+      toast.success('Student updated successfully');
+      return response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to update student');
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const deleteStudent = createAsyncThunk(
+  'students/deleteStudent',
+  async (id, { rejectWithValue }) => {
+    try {
+      await api.delete(`/admin/students/${id}`);
+      toast.success('Student deleted successfully');
+      return id;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete student');
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
 
 const initialState = {
-  list: [
-    { id: 1, fullName: 'Alice Smith', email: 'alice@proedge.com', admissionNo: 'ADM-2024-001', class: 'Class 10-A', parentEmail: 'parent1@example.com', studentId: 'STU001' },
-    { id: 2, fullName: 'Bob Jones', email: 'bob@proedge.com', admissionNo: 'ADM-2024-002', class: 'Class 9-B', parentEmail: 'parent2@example.com', studentId: 'STU002' },
-    { id: 3, fullName: 'Charlie Brown', email: 'charlie@proedge.com', admissionNo: 'ADM-2024-003', class: 'Class 10-A', parentEmail: 'parent3@example.com', studentId: 'STU003' },
-  ],
+  list: [],
+  loading: false,
+  error: null,
 };
 
 const studentSlice = createSlice({
   name: 'students',
   initialState,
-  reducers: {
-    addStudent: (state, action) => {
-      state.list.push({ ...action.payload, id: state.list.length + 1 });
-    },
-    updateStudent: (state, action) => {
-      const index = state.list.findIndex(s => s.id === action.payload.id);
-      if (index !== -1) {
-        state.list[index] = action.payload;
-      }
-    },
-    deleteStudent: (state, action) => {
-      state.list = state.list.filter(s => s.id !== action.payload);
-    },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      // Fetch Students
+      .addCase(fetchStudents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchStudents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.list = action.payload;
+      })
+      .addCase(fetchStudents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Add Student
+      .addCase(addStudent.fulfilled, (state, action) => {
+        state.list.push(action.payload);
+      })
+      // Update Student
+      .addCase(updateStudent.fulfilled, (state, action) => {
+        const index = state.list.findIndex(s => s.id === action.payload.id);
+        if (index !== -1) {
+          state.list[index] = action.payload;
+        }
+      })
+      // Delete Student
+      .addCase(deleteStudent.fulfilled, (state, action) => {
+        state.list = state.list.filter(s => s.id !== action.payload);
+      });
   },
 });
 
-export const { addStudent, updateStudent, deleteStudent } = studentSlice.actions;
 export default studentSlice.reducer;

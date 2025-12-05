@@ -1,18 +1,24 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Plus, MoreVertical } from 'lucide-react';
+import { Plus, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { InputField } from '../../components/ui/InputField';
-import { addStudent } from '../../store/slices/studentSlice';
+import { addStudent, fetchStudents, updateStudent, deleteStudent } from '../../store/slices/studentSlice';
 import toast from 'react-hot-toast';
 
 export const StudentsList = () => {
   const students = useSelector(state => state.students.list);
   const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    dispatch(fetchStudents());
+  }, [dispatch]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingStudent, setEditingStudent] = useState(null);
   const [formData, setFormData] = useState({
     fullName: '', email: '', password: '', phone: '', studentId: '', admissionNo: '', dob: ''
   });
@@ -21,15 +27,56 @@ export const StudentsList = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(addStudent({
-      fullName: formData.fullName,
-      email: formData.email,
-      admissionNo: formData.admissionNo,
-      class: 'Class 10-A', // Default for now
-      parentEmail: 'parent@example.com' // Default
-    }));
-    toast.success('Student added successfully');
+    if (editingStudent) {
+      dispatch(updateStudent({ 
+        id: editingStudent.id, 
+        data: {
+          ...formData, // API might not expect all fields or different structure, adjusting as needed
+          class: 'Class 10-A', 
+          parentEmail: 'parent@example.com' 
+        } 
+      }));
+      toast.success('Student updated successfully');
+    } else {
+      dispatch(addStudent({
+        fullName: formData.fullName,
+        email: formData.email,
+        admissionNo: formData.admissionNo,
+        class: 'Class 10-A', 
+        parentEmail: 'parent@example.com',
+        phone: formData.phone,
+        password: formData.password,
+        studentId: formData.studentId,
+        dob: formData.dob
+      }));
+      toast.success('Student added successfully');
+    }
+    closeModal();
+  };
+
+  const handleEdit = (student) => {
+    setEditingStudent(student);
+    setFormData({
+      fullName: student.fullName || '',
+      email: student.email || '',
+      password: '', // Don't populate password
+      phone: student.phone || '',
+      studentId: student.studentId || '',
+      admissionNo: student.admissionNo || '',
+      dob: student.dob || ''
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete this student?')) {
+      dispatch(deleteStudent(id));
+    }
+  };
+
+  const closeModal = () => {
     setIsModalOpen(false);
+    setEditingStudent(null);
     setFormData({ fullName: '', email: '', password: '', phone: '', studentId: '', admissionNo: '', dob: '' });
   };
 
@@ -63,7 +110,22 @@ export const StudentsList = () => {
                   <td className="px-6 py-4"><Badge variant="primary">{student.class}</Badge></td>
                   <td className="px-6 py-4">{student.parentEmail}</td>
                   <td className="px-6 py-4 text-right">
-                    <button className="text-slate-400 hover:text-indigo-600"><MoreVertical size={16} /></button>
+                    <div className="flex justify-end gap-2">
+                      <button 
+                        onClick={() => handleEdit(student)}
+                        className="p-1 text-slate-400 hover:text-indigo-600 transition-colors"
+                        title="Edit"
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(student.id)}
+                        className="p-1 text-slate-400 hover:text-red-600 transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -72,7 +134,7 @@ export const StudentsList = () => {
         </div>
       </Card>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Register New Student">
+      <Modal isOpen={isModalOpen} onClose={closeModal} title={editingStudent ? "Edit Student" : "Register New Student"}>
         <form className="space-y-4" onSubmit={handleSubmit}>
            <div className="grid grid-cols-1 gap-4">
             <InputField label="Full Name" name="fullName" value={formData.fullName} onChange={handleChange} placeholder="Alice Smith" />
@@ -84,10 +146,10 @@ export const StudentsList = () => {
           <InputField label="Date of Birth" type="date" name="dob" value={formData.dob} onChange={handleChange} />
           <InputField label="Email Address" type="email" name="email" value={formData.email} onChange={handleChange} placeholder="student@proedge.com" />
           <InputField label="Phone" name="phone" value={formData.phone} onChange={handleChange} placeholder="Contact Number" />
-          <InputField label="Password" type="password" name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" />
+          <InputField label="Password" type="password" name="password" value={formData.password} onChange={handleChange} placeholder={editingStudent ? "Leave blank to keep current" : "••••••••"} />
           
           <div className="pt-4">
-            <Button className="w-full">Register Student</Button>
+            <Button className="w-full">{editingStudent ? "Update Student" : "Register Student"}</Button>
           </div>
         </form>
       </Modal>

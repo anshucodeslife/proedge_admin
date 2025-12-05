@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AuthLayout } from '../../layouts/AuthLayout';
 import { InputField } from '../../components/ui/InputField';
 import { Button } from '../../components/ui/Button';
-import { login } from '../../store/slices/authSlice';
+import { loginUser } from '../../store/slices/authSlice';
 import toast from 'react-hot-toast';
 
 export const Login = () => {
@@ -12,16 +12,20 @@ export const Login = () => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { loading } = useSelector((state) => state.auth);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (email === 'admin@proedge.com' && password === 'password') {
-      dispatch(login({ email, role: 'admin' }));
-      toast.success('Welcome back!');
-      navigate('/');
-    } else {
-      toast.error('Invalid credentials');
+    if (!email || !password) {
+      toast.error('Please fill in all fields');
+      return;
     }
+
+    dispatch(loginUser({ email, password })).then((result) => {
+      if (result.type === 'auth/login/fulfilled') {
+        navigate('/');
+      }
+    });
   };
 
   return (
@@ -43,7 +47,9 @@ export const Login = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Button className="mt-2">Sign in</Button>
+        <Button className="mt-2" disabled={loading}>
+          {loading ? 'Signing in...' : 'Sign in'}
+        </Button>
         <div className="text-center text-sm text-slate-500 mt-2">
           Need help? <button type="button" className="text-indigo-600 font-medium hover:underline">Contact Support</button>
         </div>

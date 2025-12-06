@@ -7,7 +7,7 @@ export const fetchStaff = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/admin/staff'); // Assuming /admin/staff based on student endpoint being /admin/students
-      return response.data;
+      return response.data.data?.staff || response.data.data || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch staff');
     }
@@ -20,7 +20,7 @@ export const addStaff = createAsyncThunk(
     try {
       const response = await api.post('/admin/staff', staffData);
       toast.success('Staff member added successfully');
-      return response.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add staff');
       return rejectWithValue(error.response?.data?.message);
@@ -73,7 +73,7 @@ export const updateStaff = createAsyncThunk(
     try {
       const response = await api.put(`/admin/staff/${id}`, data);
       toast.success('Staff member updated successfully');
-      return response.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update staff');
       return rejectWithValue(error.response?.data?.message);

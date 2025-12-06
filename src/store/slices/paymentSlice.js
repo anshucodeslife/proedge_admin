@@ -7,7 +7,7 @@ export const fetchPayments = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/payments');
-      return response.data;
+      return response.data.data?.payments || response.data.data || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch payments');
     }
@@ -20,7 +20,7 @@ export const addTransaction = createAsyncThunk(
     try {
       const response = await api.post('/payments', paymentData); // Assuming a general create payment endpoint manually? Or /payments/order?
       toast.success('Payment recorded successfully');
-      return response.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to record payment');
       return rejectWithValue(error.response?.data?.message);
@@ -72,7 +72,7 @@ export const deleteTransaction = createAsyncThunk(
       toast.success('Transaction deleted/voided successfully');
       return id;
     } catch (error) {
-       toast.error(error.response?.data?.message || 'Failed to delete transaction');
+      toast.error(error.response?.data?.message || 'Failed to delete transaction');
       return rejectWithValue(error.response?.data?.message);
     }
   }

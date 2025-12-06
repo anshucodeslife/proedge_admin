@@ -28,13 +28,13 @@ export const StudentsList = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (editingStudent) {
-      dispatch(updateStudent({ 
-        id: editingStudent.id, 
+      dispatch(updateStudent({
+        id: editingStudent.id,
         data: {
           ...formData, // API might not expect all fields or different structure, adjusting as needed
-          class: 'Class 10-A', 
-          parentEmail: 'parent@example.com' 
-        } 
+          class: 'Class 10-A',
+          parentEmail: 'parent@example.com'
+        }
       }));
       toast.success('Student updated successfully');
     } else {
@@ -42,11 +42,12 @@ export const StudentsList = () => {
         fullName: formData.fullName,
         email: formData.email,
         admissionNo: formData.admissionNo,
-        class: 'Class 10-A', 
+        class: 'Class 10-A',
         parentEmail: 'parent@example.com',
         phone: formData.phone,
         password: formData.password,
         studentId: formData.studentId,
+        isPreApproved: true,
         dob: formData.dob
       }));
       toast.success('Student added successfully');
@@ -111,14 +112,14 @@ export const StudentsList = () => {
                   <td className="px-6 py-4">{student.parentEmail}</td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
-                      <button 
+                      <button
                         onClick={() => handleEdit(student)}
                         className="p-1 text-slate-400 hover:text-indigo-600 transition-colors"
                         title="Edit"
                       >
                         <Edit size={16} />
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleDelete(student.id)}
                         className="p-1 text-slate-400 hover:text-red-600 transition-colors"
                         title="Delete"
@@ -136,18 +137,18 @@ export const StudentsList = () => {
 
       <Modal isOpen={isModalOpen} onClose={closeModal} title={editingStudent ? "Edit Student" : "Register New Student"}>
         <form className="space-y-4" onSubmit={handleSubmit}>
-           <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <InputField label="Full Name" name="fullName" value={formData.fullName} onChange={handleChange} placeholder="Alice Smith" />
           </div>
           <div className="grid grid-cols-2 gap-4">
-             <InputField label="Admission No" name="admissionNo" value={formData.admissionNo} onChange={handleChange} placeholder="ADM001" />
-             <InputField label="Student ID" type="number" name="studentId" value={formData.studentId} onChange={handleChange} placeholder="1001" />
+            <InputField label="Admission No" name="admissionNo" value={formData.admissionNo} onChange={handleChange} placeholder="ADM001" />
+            <InputField label="Student ID" type="number" name="studentId" value={formData.studentId} onChange={handleChange} placeholder="1001" />
           </div>
           <InputField label="Date of Birth" type="date" name="dob" value={formData.dob} onChange={handleChange} />
           <InputField label="Email Address" type="email" name="email" value={formData.email} onChange={handleChange} placeholder="student@proedge.com" />
           <InputField label="Phone" name="phone" value={formData.phone} onChange={handleChange} placeholder="Contact Number" />
           <InputField label="Password" type="password" name="password" value={formData.password} onChange={handleChange} placeholder={editingStudent ? "Leave blank to keep current" : "••••••••"} />
-          
+
           <div className="pt-4">
             <Button className="w-full">{editingStudent ? "Update Student" : "Register Student"}</Button>
           </div>

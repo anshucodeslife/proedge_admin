@@ -7,7 +7,7 @@ export const fetchParents = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/parents');
-      return response.data;
+      return response.data.data?.parents || response.data.data || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch parents');
     }
@@ -20,7 +20,7 @@ export const addParent = createAsyncThunk(
     try {
       const response = await api.post('/parents', parentData);
       toast.success('Parent added successfully');
-      return response.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add parent');
       return rejectWithValue(error.response?.data?.message);
@@ -73,7 +73,7 @@ export const updateParent = createAsyncThunk(
     try {
       const response = await api.put(`/parents/${id}`, data);
       toast.success('Parent updated successfully');
-      return response.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update parent');
       return rejectWithValue(error.response?.data?.message);
@@ -89,7 +89,7 @@ export const deleteParent = createAsyncThunk(
       toast.success('Parent deleted successfully');
       return id;
     } catch (error) {
-       toast.error(error.response?.data?.message || 'Failed to delete parent');
+      toast.error(error.response?.data?.message || 'Failed to delete parent');
       return rejectWithValue(error.response?.data?.message);
     }
   }

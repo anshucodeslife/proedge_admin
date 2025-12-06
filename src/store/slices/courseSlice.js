@@ -7,7 +7,7 @@ export const fetchCourses = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/courses');
-      return response.data;
+      return response.data.data?.courses || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch courses');
     }
@@ -20,9 +20,37 @@ export const addCourse = createAsyncThunk(
     try {
       const response = await api.post('/courses', courseData);
       toast.success('Course created successfully');
-      return response.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to create course');
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const updateCourse = createAsyncThunk(
+  'courses/updateCourse',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`/courses/${id}`, data);
+      toast.success('Course updated successfully');
+      return response.data.data || response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to update course');
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const deleteCourse = createAsyncThunk(
+  'courses/deleteCourse',
+  async (id, { rejectWithValue }) => {
+    try {
+      await api.delete(`/courses/${id}`);
+      toast.success('Course deleted successfully');
+      return id;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete course');
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -70,33 +98,5 @@ const courseSlice = createSlice({
       });
   },
 });
-
-export const updateCourse = createAsyncThunk(
-  'courses/updateCourse',
-  async ({ id, data }, { rejectWithValue }) => {
-    try {
-      const response = await api.put(`/courses/${id}`, data);
-      toast.success('Course updated successfully');
-      return response.data;
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to update course');
-      return rejectWithValue(error.response?.data?.message);
-    }
-  }
-);
-
-export const deleteCourse = createAsyncThunk(
-  'courses/deleteCourse',
-  async (id, { rejectWithValue }) => {
-    try {
-      await api.delete(`/courses/${id}`);
-      toast.success('Course deleted successfully');
-      return id;
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to delete course');
-      return rejectWithValue(error.response?.data?.message);
-    }
-  }
-);
 
 export default courseSlice.reducer;

@@ -7,7 +7,7 @@ export const fetchNotifications = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/notifications');
-      return response.data;
+      return response.data.data?.notifications || response.data.data || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch notifications');
     }
@@ -18,9 +18,9 @@ export const sendNotification = createAsyncThunk(
   'notifications/sendNotification',
   async (notificationData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/notifications', notificationData);
+      const response = await api.post('/notifications/send', notificationData);
       toast.success('Notification sent successfully');
-      return response.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to send notification');
       return rejectWithValue(error.response?.data?.message);

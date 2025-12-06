@@ -7,7 +7,7 @@ export const fetchEnrollments = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/enrollments');
-      return response.data;
+      return response.data.data?.enrollments || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch enrollments');
     }
@@ -20,7 +20,7 @@ export const enrollStudent = createAsyncThunk(
     try {
       const response = await api.post('/enrollments', enrollmentData);
       toast.success('Student enrolled successfully');
-      return response.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to enroll student');
       return rejectWithValue(error.response?.data?.message);
@@ -72,7 +72,7 @@ export const deleteEnrollment = createAsyncThunk(
       toast.success('Enrollment deleted successfully');
       return id;
     } catch (error) {
-       toast.error(error.response?.data?.message || 'Failed to delete enrollment');
+      toast.error(error.response?.data?.message || 'Failed to delete enrollment');
       return rejectWithValue(error.response?.data?.message);
     }
   }

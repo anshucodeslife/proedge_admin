@@ -7,7 +7,7 @@ export const fetchAttendance = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/attendance');
-      return response.data;
+      return response.data.data?.attendance || response.data.data || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch attendance');
     }
@@ -20,7 +20,7 @@ export const markAttendance = createAsyncThunk(
     try {
       const response = await api.post('/attendance', attendanceData);
       toast.success('Attendance marked successfully');
-      return response.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to mark attendance');
       return rejectWithValue(error.response?.data?.message);

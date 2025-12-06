@@ -8,7 +8,8 @@ export const loginUser = createAsyncThunk(
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const response = await api.post('/auth/login', { email, password });
-      localStorage.setItem('token', response.data.token);
+      const token = response.data.data?.token || response.data.token;
+      localStorage.setItem('token', token);
       return response.data;
     } catch (error) {
       const message = error.response?.data?.message || 'Login failed';
@@ -47,8 +48,9 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.isAuthenticated = true;
-        state.token = action.payload.token;
-        state.user = action.payload.user; // Assuming backend returns user info
+        state.isAuthenticated = true;
+        state.token = action.payload.data?.token || action.payload.token;
+        state.user = action.payload.data?.user || action.payload.user; // Assuming backend returns user info
         toast.success('Login successful!');
       })
       .addCase(loginUser.rejected, (state, action) => {

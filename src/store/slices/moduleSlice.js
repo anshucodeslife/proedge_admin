@@ -7,7 +7,7 @@ export const fetchModules = createAsyncThunk(
   async (courseId, { rejectWithValue }) => {
     try {
       const response = await api.get('/lms/modules', { params: { courseId } });
-      return response.data;
+      return response.data.data?.modules || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch modules');
     }
@@ -20,7 +20,7 @@ export const addModule = createAsyncThunk(
     try {
       const response = await api.post('/lms/modules', moduleData);
       toast.success('Module added successfully');
-      return response.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add module');
       return rejectWithValue(error.response?.data?.message);
@@ -34,9 +34,65 @@ export const addLesson = createAsyncThunk(
     try {
       const response = await api.post('/lms/lessons', lessonData);
       toast.success('Lesson added successfully');
-      return response.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add lesson');
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const updateModule = createAsyncThunk(
+  'modules/updateModule',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`/lms/modules/${id}`, data);
+      toast.success('Module updated successfully');
+      return response.data.data || response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to update module');
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const deleteModule = createAsyncThunk(
+  'modules/deleteModule',
+  async (id, { rejectWithValue }) => {
+    try {
+      await api.delete(`/lms/modules/${id}`);
+      toast.success('Module deleted successfully');
+      return id;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete module');
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const updateLesson = createAsyncThunk(
+  'modules/updateLesson',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`/lms/lessons/${id}`, data);
+      toast.success('Lesson updated successfully');
+      return response.data.data || response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to update lesson');
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const deleteLesson = createAsyncThunk(
+  'modules/deleteLesson',
+  async ({ lessonId, moduleId }, { rejectWithValue }) => {
+    try {
+      await api.delete(`/lms/lessons/${lessonId}`);
+      toast.success('Lesson deleted successfully');
+      return { lessonId, moduleId };
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete lesson');
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -109,61 +165,5 @@ const moduleSlice = createSlice({
       });
   },
 });
-
-export const updateModule = createAsyncThunk(
-  'modules/updateModule',
-  async ({ id, data }, { rejectWithValue }) => {
-    try {
-      const response = await api.put(`/lms/modules/${id}`, data);
-      toast.success('Module updated successfully');
-      return response.data;
-    } catch (error) {
-       toast.error(error.response?.data?.message || 'Failed to update module');
-      return rejectWithValue(error.response?.data?.message);
-    }
-  }
-);
-
-export const deleteModule = createAsyncThunk(
-  'modules/deleteModule',
-  async (id, { rejectWithValue }) => {
-    try {
-      await api.delete(`/lms/modules/${id}`);
-      toast.success('Module deleted successfully');
-      return id;
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to delete module');
-      return rejectWithValue(error.response?.data?.message);
-    }
-  }
-);
-
-export const updateLesson = createAsyncThunk(
-  'modules/updateLesson',
-  async ({ id, data }, { rejectWithValue }) => {
-    try {
-      const response = await api.put(`/lms/lessons/${id}`, data);
-      toast.success('Lesson updated successfully');
-      return response.data;
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to update lesson');
-      return rejectWithValue(error.response?.data?.message);
-    }
-  }
-);
-
-export const deleteLesson = createAsyncThunk(
-  'modules/deleteLesson',
-  async ({ lessonId, moduleId }, { rejectWithValue }) => {
-    try {
-      await api.delete(`/lms/lessons/${lessonId}`);
-      toast.success('Lesson deleted successfully');
-      return { lessonId, moduleId };
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to delete lesson');
-      return rejectWithValue(error.response?.data?.message);
-    }
-  }
-);
 
 export default moduleSlice.reducer;

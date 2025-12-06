@@ -7,7 +7,7 @@ export const fetchQuestions = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/questions');
-      return response.data;
+      return response.data.data?.questions || response.data.data || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch questions');
     }
@@ -20,7 +20,7 @@ export const addQuestion = createAsyncThunk(
     try {
       const response = await api.post('/questions', questionData);
       toast.success('Question added successfully');
-      return response.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add question');
       return rejectWithValue(error.response?.data?.message);
@@ -73,7 +73,7 @@ export const updateQuestion = createAsyncThunk(
     try {
       const response = await api.put(`/questions/${id}`, data);
       toast.success('Question updated successfully');
-      return response.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update question');
       return rejectWithValue(error.response?.data?.message);

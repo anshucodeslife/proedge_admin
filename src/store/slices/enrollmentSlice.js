@@ -7,22 +7,50 @@ export const fetchEnrollments = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/enrollments');
-      return response.data;
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch enrollments');
     }
   }
 );
 
-export const enrollStudent = createAsyncThunk(
-  'enrollments/enrollStudent',
+export const addEnrollment = createAsyncThunk(
+  'enrollments/addEnrollment',
   async (enrollmentData, { rejectWithValue }) => {
     try {
       const response = await api.post('/enrollments', enrollmentData);
       toast.success('Student enrolled successfully');
-      return response.data;
+      return response.data.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to enroll student');
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const updateEnrollment = createAsyncThunk(
+  'enrollments/updateEnrollment',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`/enrollments/${id}`, data);
+      toast.success('Enrollment updated successfully');
+      return response.data.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to update enrollment');
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const deleteEnrollment = createAsyncThunk(
+  'enrollments/deleteEnrollment',
+  async (id, { rejectWithValue }) => {
+    try {
+      await api.delete(`/enrollments/${id}`);
+      toast.success('Enrollment removed successfully');
+      return id;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete enrollment');
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -40,11 +68,7 @@ const enrollmentSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch Enrollments
-      .addCase(fetchEnrollments.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(fetchEnrollments.pending, (state) => { state.loading = true; })
       .addCase(fetchEnrollments.fulfilled, (state, action) => {
         state.loading = false;
         state.list = action.payload;
@@ -53,29 +77,17 @@ const enrollmentSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Enroll Student
-      .addCase(enrollStudent.fulfilled, (state, action) => {
+      .addCase(addEnrollment.fulfilled, (state, action) => {
         state.list.push(action.payload);
       })
-      // Delete Enrollment
+      .addCase(updateEnrollment.fulfilled, (state, action) => {
+        const index = state.list.findIndex(e => e.id === action.payload.id);
+        if (index !== -1) state.list[index] = action.payload;
+      })
       .addCase(deleteEnrollment.fulfilled, (state, action) => {
         state.list = state.list.filter(e => e.id !== action.payload);
       });
   },
 });
-
-export const deleteEnrollment = createAsyncThunk(
-  'enrollments/deleteEnrollment',
-  async (id, { rejectWithValue }) => {
-    try {
-      await api.delete(`/enrollments/${id}`);
-      toast.success('Enrollment deleted successfully');
-      return id;
-    } catch (error) {
-       toast.error(error.response?.data?.message || 'Failed to delete enrollment');
-      return rejectWithValue(error.response?.data?.message);
-    }
-  }
-);
 
 export default enrollmentSlice.reducer;

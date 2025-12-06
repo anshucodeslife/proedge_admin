@@ -6,8 +6,8 @@ export const fetchAttendance = createAsyncThunk(
   'attendance/fetchAttendance',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/attendance');
-      return response.data;
+      const response = await api.get('/enrollments/attendance');
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch attendance');
     }
@@ -18,9 +18,9 @@ export const markAttendance = createAsyncThunk(
   'attendance/markAttendance',
   async (attendanceData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/attendance', attendanceData);
+      const response = await api.post('/enrollments/attendance', attendanceData);
       toast.success('Attendance marked successfully');
-      return response.data;
+      return response.data.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to mark attendance');
       return rejectWithValue(error.response?.data?.message);
@@ -28,11 +28,7 @@ export const markAttendance = createAsyncThunk(
   }
 );
 
-const initialState = {
-  records: [],
-  loading: false,
-  error: null,
-};
+const initialState = { list: [], loading: false, error: null };
 
 const attendanceSlice = createSlice({
   name: 'attendance',
@@ -40,20 +36,17 @@ const attendanceSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchAttendance.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(fetchAttendance.pending, (state) => { state.loading = true; })
       .addCase(fetchAttendance.fulfilled, (state, action) => {
         state.loading = false;
-        state.records = action.payload;
+        state.list = action.payload;
       })
       .addCase(fetchAttendance.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
       .addCase(markAttendance.fulfilled, (state, action) => {
-        state.records.unshift({ ...action.payload, status: 'Marked' });
+        state.list.push(action.payload);
       });
   },
 });

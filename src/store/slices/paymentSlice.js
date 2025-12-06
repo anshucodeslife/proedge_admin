@@ -7,29 +7,29 @@ export const fetchPayments = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/payments');
-      return response.data;
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch payments');
     }
   }
 );
 
-export const addTransaction = createAsyncThunk(
-  'payments/addTransaction',
-  async (paymentData, { rejectWithValue }) => {
+export const createPaymentOrder = createAsyncThunk(
+  'payments/createOrder',
+  async (orderData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/payments', paymentData); // Assuming a general create payment endpoint manually? Or /payments/order?
-      toast.success('Payment recorded successfully');
-      return response.data;
+      const response = await api.post('/payments/order', orderData);
+      toast.success('Payment order created');
+      return response.data.data;
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to record payment');
+      toast.error(error.response?.data?.message || 'Failed to create order');
       return rejectWithValue(error.response?.data?.message);
     }
   }
 );
 
 const initialState = {
-  transactions: [],
+  list: [],
   loading: false,
   error: null,
 };
@@ -40,42 +40,19 @@ const paymentSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch Payments
-      .addCase(fetchPayments.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(fetchPayments.pending, (state) => { state.loading = true; })
       .addCase(fetchPayments.fulfilled, (state, action) => {
         state.loading = false;
-        state.transactions = action.payload;
+        state.list = action.payload;
       })
       .addCase(fetchPayments.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      // Add Transaction
-      .addCase(addTransaction.fulfilled, (state, action) => {
-        state.transactions.unshift(action.payload);
-      })
-      // Delete Transaction
-      .addCase(deleteTransaction.fulfilled, (state, action) => {
-        state.transactions = state.transactions.filter(t => t.id !== action.payload);
+      .addCase(createPaymentOrder.fulfilled, (state, action) => {
+        state.list.push(action.payload);
       });
   },
 });
-
-export const deleteTransaction = createAsyncThunk(
-  'payments/deleteTransaction',
-  async (id, { rejectWithValue }) => {
-    try {
-      await api.delete(`/payments/${id}`);
-      toast.success('Transaction deleted/voided successfully');
-      return id;
-    } catch (error) {
-       toast.error(error.response?.data?.message || 'Failed to delete transaction');
-      return rejectWithValue(error.response?.data?.message);
-    }
-  }
-);
 
 export default paymentSlice.reducer;

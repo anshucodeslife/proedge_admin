@@ -6,11 +6,11 @@ import { Dashboard } from '../pages/Dashboard/Dashboard';
 import { StudentsList } from '../pages/Students/StudentsList';
 import { CoursesList } from '../pages/Courses/CoursesList';
 import { ModulesList } from '../pages/Modules/ModulesList';
-import { BatchList } from '../pages/Batches/BatchList';
+import { BatchesList } from '../pages/Batches/BatchesList';
 import { EnrollmentList } from '../pages/Enrollments/EnrollmentList';
 import { AttendanceList } from '../pages/Attendance/AttendanceList';
 import { NotificationList } from '../pages/Notifications/NotificationList';
-import { Transactions } from '../pages/Payments/Transactions';
+import { PaymentsList } from '../pages/Payments/PaymentsList';
 import { ProfileSettings } from '../pages/Settings/ProfileSettings';
 import { StaffList } from '../pages/Staff/StaffList';
 import { ParentsList } from '../pages/Parents/ParentsList';
@@ -25,11 +25,11 @@ export const AppRouter = () => {
         <Route path="students" element={<StudentsList />} />
         <Route path="courses" element={<CoursesList />} />
         <Route path="academics" element={<ModulesList />} /> {/* Using Modules as Academics/Syllabus for now as per menu */}
-        <Route path="batches" element={<BatchList />} />
+        <Route path="batches" element={<BatchesList />} />
         <Route path="enrollments" element={<EnrollmentList />} />
         <Route path="attendance" element={<AttendanceList />} />
         <Route path="notifications" element={<NotificationList />} />
-        <Route path="payments" element={<Transactions />} />
+        <Route path="payments" element={<PaymentsList />} />
         <Route path="settings" element={<ProfileSettings />} />
         
         {/* Mapped routes based on Sidebar menu items */}

@@ -7,6 +7,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { InputField } from '../../components/ui/InputField';
 import { SelectField } from '../../components/ui/SelectField';
+import { VideoUploader } from '../../components/VideoUploader';
 import { addModule, addLesson, fetchModules, updateModule, deleteModule, updateLesson, deleteLesson } from '../../store/slices/moduleSlice';
 import { fetchCourses } from '../../store/slices/courseSlice';
 import toast from 'react-hot-toast';

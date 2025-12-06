@@ -7,7 +7,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { InputField } from '../../components/ui/InputField';
 import { SelectField } from '../../components/ui/SelectField';
-import { VideoUploader } from '../../components/VideoUploader';
+import { FileUpload } from '../../components/ui/FileUpload';
 import { addModule, addLesson, fetchModules, updateModule, deleteModule, updateLesson, deleteLesson } from '../../store/slices/moduleSlice';
 import { fetchCourses } from '../../store/slices/courseSlice';
 import toast from 'react-hot-toast';
@@ -19,9 +19,9 @@ export const ModulesList = () => {
 
   React.useEffect(() => {
     dispatch(fetchCourses());
-    dispatch(fetchModules()); 
+    dispatch(fetchModules());
   }, [dispatch]);
-  
+
   const [expandedModule, setExpandedModule] = useState(null);
   const [isModuleModalOpen, setIsModuleModalOpen] = useState(false);
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
@@ -41,10 +41,10 @@ export const ModulesList = () => {
   const openModuleModal = (module = null) => {
     setEditingModule(module);
     if (module) {
-      setModuleForm({ 
-        title: module.title, 
-        courseId: module.courseId || '', 
-        order: module.order || '' 
+      setModuleForm({
+        title: module.title,
+        courseId: module.courseId || '',
+        order: module.order || ''
       });
     } else {
       setModuleForm({ title: '', courseId: '', order: '' });
@@ -55,9 +55,9 @@ export const ModulesList = () => {
   const handleModuleSubmit = (e) => {
     e.preventDefault();
     if (editingModule) {
-      dispatch(updateModule({ 
-        id: editingModule.id, 
-        data: { ...moduleForm, courseId: Number(moduleForm.courseId), order: Number(moduleForm.order) } 
+      dispatch(updateModule({
+        id: editingModule.id,
+        data: { ...moduleForm, courseId: Number(moduleForm.courseId), order: Number(moduleForm.order) }
       }));
     } else {
       dispatch(addModule({ ...moduleForm, courseId: Number(moduleForm.courseId), order: Number(moduleForm.order) }));
@@ -94,14 +94,14 @@ export const ModulesList = () => {
   const handleLessonSubmit = (e) => {
     e.preventDefault();
     if (editingLesson) {
-       dispatch(updateLesson({ 
-         id: editingLesson.id, 
-         data: { ...lessonForm, durationSec: Number(lessonForm.durationSec), order: Number(lessonForm.order), moduleId: selectedModuleId } 
-       }));
+      dispatch(updateLesson({
+        id: editingLesson.id,
+        data: { ...lessonForm, durationSec: Number(lessonForm.durationSec), order: Number(lessonForm.order), moduleId: selectedModuleId }
+      }));
     } else {
-      dispatch(addLesson({ 
-        moduleId: selectedModuleId, 
-        lesson: { ...lessonForm, durationSec: Number(lessonForm.durationSec), order: Number(lessonForm.order) } 
+      dispatch(addLesson({
+        moduleId: selectedModuleId,
+        lesson: { ...lessonForm, durationSec: Number(lessonForm.durationSec), order: Number(lessonForm.order) }
       }));
     }
     setIsLessonModalOpen(false);
@@ -110,7 +110,7 @@ export const ModulesList = () => {
   };
 
   const handleDeleteLesson = (moduleId, lessonId) => {
-     if (window.confirm('Are you sure you want to delete this lesson?')) {
+    if (window.confirm('Are you sure you want to delete this lesson?')) {
       dispatch(deleteLesson({ moduleId, lessonId }));
     }
   };
@@ -128,7 +128,7 @@ export const ModulesList = () => {
       <div className="space-y-4">
         {modules.map((module) => (
           <Card key={module.id} className="overflow-hidden">
-            <div 
+            <div
               className="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors"
               onClick={() => toggleExpand(module.id)}
             >
@@ -142,30 +142,30 @@ export const ModulesList = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button 
+                <button
                   onClick={(e) => { e.stopPropagation(); openModuleModal(module); }}
                   className="p-1 text-slate-400 hover:text-indigo-600 transition-colors"
                   title="Edit Module"
                 >
                   <Edit size={16} />
                 </button>
-                <button 
+                <button
                   onClick={(e) => { e.stopPropagation(); handleDeleteModule(module.id); }}
                   className="p-1 text-slate-400 hover:text-red-600 transition-colors"
                   title="Delete Module"
                 >
                   <Trash2 size={16} />
                 </button>
-                <Button 
-                  variant="ghost" 
-                  className="text-xs ml-2" 
+                <Button
+                  variant="ghost"
+                  className="text-xs ml-2"
                   onClick={(e) => { e.stopPropagation(); openLessonModal(module.id); }}
                 >
                   + Add Lesson
                 </Button>
               </div>
             </div>
-            
+
             {expandedModule === module.id && (
               <div className="bg-slate-50 border-t border-slate-100 p-4 space-y-2">
                 {(!module.lessons || module.lessons.length === 0) ? (
@@ -181,14 +181,14 @@ export const ModulesList = () => {
                       </div>
                       <div className="flex items-center gap-3">
                         <Badge variant="neutral">{Math.floor(lesson.durationSec / 60)} mins</Badge>
-                        <button 
+                        <button
                           onClick={() => openLessonModal(module.id, lesson)}
                           className="p-1 text-slate-400 hover:text-indigo-600 transition-colors"
                           title="Edit Lesson"
                         >
                           <Edit size={14} />
                         </button>
-                         <button 
+                        <button
                           onClick={() => handleDeleteLesson(module.id, lesson.id)}
                           className="p-1 text-slate-400 hover:text-red-600 transition-colors"
                           title="Delete Lesson"
@@ -208,13 +208,13 @@ export const ModulesList = () => {
       {/* Module Modal */}
       <Modal isOpen={isModuleModalOpen} onClose={() => setIsModuleModalOpen(false)} title={editingModule ? "Edit Module" : "Create Module"}>
         <form className="space-y-4" onSubmit={handleModuleSubmit}>
-          <InputField label="Module Title" value={moduleForm.title} onChange={(e) => setModuleForm({...moduleForm, title: e.target.value})} placeholder="e.g., Algebra Basics" />
-          <InputField label="Order" type="number" value={moduleForm.order} onChange={(e) => setModuleForm({...moduleForm, order: e.target.value})} placeholder="1" />
-          <SelectField 
-            label="Assign to Course" 
-            value={moduleForm.courseId} 
-            onChange={(e) => setModuleForm({...moduleForm, courseId: e.target.value})} 
-            options={courses.map(c => ({ value: c.id, label: c.title }))} 
+          <InputField label="Module Title" value={moduleForm.title} onChange={(e) => setModuleForm({ ...moduleForm, title: e.target.value })} placeholder="e.g., Algebra Basics" />
+          <InputField label="Order" type="number" value={moduleForm.order} onChange={(e) => setModuleForm({ ...moduleForm, order: e.target.value })} placeholder="1" />
+          <SelectField
+            label="Assign to Course"
+            value={moduleForm.courseId}
+            onChange={(e) => setModuleForm({ ...moduleForm, courseId: e.target.value })}
+            options={courses.map(c => ({ value: c.id, label: c.title }))}
           />
           <div className="pt-4">
             <Button className="w-full">{editingModule ? "Update Module" : "Create Module"}</Button>
@@ -225,18 +225,32 @@ export const ModulesList = () => {
       {/* Lesson Modal */}
       <Modal isOpen={isLessonModalOpen} onClose={() => setIsLessonModalOpen(false)} title={editingLesson ? "Edit Lesson" : "Add Lesson"}>
         <form className="space-y-4" onSubmit={handleLessonSubmit}>
-          <InputField label="Lesson Title" value={lessonForm.title} onChange={(e) => setLessonForm({...lessonForm, title: e.target.value})} placeholder="e.g., Introduction Video" />
+          <InputField label="Lesson Title" value={lessonForm.title} onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })} placeholder="e.g., Introduction Video" />
           <div className="grid grid-cols-2 gap-4">
-            <InputField label="Order" type="number" value={lessonForm.order} onChange={(e) => setLessonForm({...lessonForm, order: e.target.value})} placeholder="1" />
-            <SelectField 
-              label="Type" 
-              value={lessonForm.type} 
-              onChange={(e) => setLessonForm({...lessonForm, type: e.target.value})} 
-              options={[{ value: 'Video', label: 'Video' }, { value: 'Document', label: 'Document' }]} 
+            <InputField label="Order" type="number" value={lessonForm.order} onChange={(e) => setLessonForm({ ...lessonForm, order: e.target.value })} placeholder="1" />
+            <SelectField
+              label="Type"
+              value={lessonForm.type}
+              onChange={(e) => setLessonForm({ ...lessonForm, type: e.target.value })}
+              options={[{ value: 'Video', label: 'Video' }, { value: 'Document', label: 'Document' }]}
             />
           </div>
-          <InputField label="Duration (Seconds)" type="number" value={lessonForm.durationSec} onChange={(e) => setLessonForm({...lessonForm, durationSec: e.target.value})} placeholder="600" />
-          <InputField label="Video URL" value={lessonForm.videoUrl} onChange={(e) => setLessonForm({...lessonForm, videoUrl: e.target.value})} placeholder="s3://..." />
+          <InputField label="Duration (Seconds)" type="number" value={lessonForm.durationSec} onChange={(e) => setLessonForm({ ...lessonForm, durationSec: e.target.value })} placeholder="600" />
+
+          {lessonForm.type === 'Video' && (
+            <FileUpload
+              label="Lesson Video"
+              folder="lessons/videos"
+              accept="video/*"
+              initialValue={lessonForm.videoUrl}
+              onUploadComplete={(key) => setLessonForm({ ...lessonForm, videoUrl: key })}
+            />
+          )}
+
+          {lessonForm.type !== 'Video' && (
+            <InputField label="Document URL" value={lessonForm.videoUrl} onChange={(e) => setLessonForm({ ...lessonForm, videoUrl: e.target.value })} placeholder="https://..." />
+          )}
+
           <div className="pt-4">
             <Button className="w-full">{editingLesson ? "Update Lesson" : "Add Lesson"}</Button>
           </div>

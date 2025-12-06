@@ -18,7 +18,7 @@ export const fetchStudents = createAsyncThunk(
         sortOrder
       });
       const response = await api.get(`/admin/students?${params}`);
-      return response.data.data; // Returns { students, pagination }
+      return response.data.data || { students: response.data.data?.students || [], pagination: {} };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch students');
     }
@@ -45,7 +45,8 @@ export const addStudent = createAsyncThunk(
     try {
       const response = await api.post('/admin/students', studentData);
       toast.success('Student added successfully');
-      return response.data.data;
+      const data = response.data.data || response.data;
+      return data.student || data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add student');
       return rejectWithValue(error.response?.data?.message);
@@ -60,7 +61,8 @@ export const updateStudent = createAsyncThunk(
     try {
       const response = await api.put(`/admin/students/${id}`, data);
       toast.success('Student updated successfully');
-      return response.data.data;
+      const responseData = response.data.data || response.data;
+      return responseData.student || responseData;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update student');
       return rejectWithValue(error.response?.data?.message);

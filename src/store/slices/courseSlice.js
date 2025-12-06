@@ -9,7 +9,7 @@ export const fetchCourses = createAsyncThunk(
     try {
       const params = new URLSearchParams({ page, limit, sortBy, sortOrder, ...(search && { search }) });
       const response = await api.get(`/admin/courses?${params}`);
-      return response.data.data;
+      return response.data.data || { courses: response.data.data?.courses || [], pagination: {} };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch courses');
     }
@@ -48,8 +48,8 @@ export const addCourse = createAsyncThunk(
   async (courseData, { rejectWithValue }) => {
     try {
       const response = await api.post('/courses', courseData);
-      toast.success('Course added successfully');
-      return response.data.data;
+      toast.success('Course created successfully');
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add course');
       return rejectWithValue(error.response?.data?.message);
@@ -64,7 +64,7 @@ export const updateCourse = createAsyncThunk(
     try {
       const response = await api.put(`/courses/${id}`, data);
       toast.success('Course updated successfully');
-      return response.data.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update course');
       return rejectWithValue(error.response?.data?.message);
@@ -102,10 +102,13 @@ const courseSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchCourses.pending, (state) => { state.loading = true; })
+      .addCase(fetchCourses.pending, (state) => { 
+        state.loading = true; 
+        state.error = null;
+      })
       .addCase(fetchCourses.fulfilled, (state, action) => {
         state.loading = false;
-        state.list = action.payload.courses || [];
+        state.list = action.payload.courses || action.payload || [];
         state.pagination = action.payload.pagination || state.pagination;
       })
       .addCase(fetchCourses.rejected, (state, action) => {

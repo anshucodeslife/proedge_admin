@@ -11,6 +11,7 @@ import paymentReducer from './slices/paymentSlice';
 import staffReducer from './slices/staffSlice';
 import parentReducer from './slices/parentSlice';
 import questionReducer from './slices/questionSlice';
+import dashboardReducer from './slices/dashboardSlice';
 
 export const store = configureStore({
   reducer: {
@@ -26,5 +27,6 @@ export const store = configureStore({
     staff: staffReducer,
     parents: parentReducer,
     questions: questionReducer,
+    dashboard: dashboardReducer,
   },
 });

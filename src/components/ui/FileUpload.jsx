@@ -1,0 +1,108 @@
+import React, { useState } from 'react';
+import api from '../../api/axios';
+import { Button } from './Button';
+import { Upload, X, Check, Loader2 } from 'lucide-react';
+
+export const FileUpload = ({ label, folder, accept, onUploadComplete, initialValue }) => {
+    const [uploading, setUploading] = useState(false);
+    const [uploadedKey, setUploadedKey] = useState(initialValue || '');
+    const [error, setError] = useState(null);
+
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setUploading(true);
+        setError(null);
+
+        try {
+            // 1. Get Signed URL
+            const { data } = await api.post('/upload/signed-url', {
+                fileName: file.name,
+                fileType: file.type,
+                folder: folder || 'general'
+            });
+
+            const { uploadUrl, key } = data.data;
+
+            // 2. Upload to S3 using standard fetch (bypass axios interceptors to avoid auth headers on S3)
+            const uploadRes = await fetch(uploadUrl, {
+                method: 'PUT',
+                body: file,
+                headers: {
+                    'Content-Type': file.type
+                }
+            });
+
+            if (!uploadRes.ok) {
+                throw new Error('Failed to upload file to storage');
+            }
+
+            // 3. Success
+            setUploadedKey(key);
+            onUploadComplete(key); // Return key to parent form
+
+        } catch (err) {
+            console.error(err);
+            setError(err.message || 'Upload failed');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const clearFile = () => {
+        setUploadedKey('');
+        onUploadComplete('');
+    };
+
+    return (
+        <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-700">{label}</label>
+
+            {!uploadedKey ? (
+                <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors">
+                    {uploading ? (
+                        <div className="text-center">
+                            <Loader2 className="animate-spin text-indigo-600 mb-2 mx-auto" size={24} />
+                            <p className="text-sm text-slate-500">Uploading...</p>
+                        </div>
+                    ) : (
+                        <>
+                            <Upload className="text-slate-400 mb-2" size={24} />
+                            <p className="text-sm text-slate-500 mb-2">Click to upload {accept && `(${accept})`}</p>
+                            <input
+                                type="file"
+                                accept={accept}
+                                onChange={handleFileChange}
+                                className="hidden"
+                                id={`file-upload-${folder}`}
+                            />
+                            <label
+                                htmlFor={`file-upload-${folder}`}
+                                className="cursor-pointer bg-white px-4 py-2 border border-slate-300 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50"
+                            >
+                                Select File
+                            </label>
+                        </>
+                    )}
+                    {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
+                </div>
+            ) : (
+                <div className="flex items-center justify-between p-3 bg-green-50 border border-green-100 rounded-lg">
+                    <div className="flex items-center gap-2 overflow-hidden">
+                        <Check className="text-green-600 flex-shrink-0" size={18} />
+                        <span className="text-sm text-green-700 truncate font-medium">Upload Complete</span>
+                        <span className="text-xs text-slate-500 truncate max-w-[150px]">{uploadedKey}</span>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={clearFile}
+                        className="p-1 hover:bg-green-100 rounded-full text-green-700 transition-colors"
+                    >
+                        <X size={16} />
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+};

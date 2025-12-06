@@ -7,7 +7,7 @@ export const fetchParents = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/parents');
-      return response.data.data;
+      return response.data.data?.parents || response.data.data || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch parents');
     }
@@ -20,7 +20,7 @@ export const addParent = createAsyncThunk(
     try {
       const response = await api.post('/parents', parentData);
       toast.success('Parent added successfully');
-      return response.data.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add parent');
       return rejectWithValue(error.response?.data?.message);
@@ -28,13 +28,52 @@ export const addParent = createAsyncThunk(
   }
 );
 
+const initialState = {
+  list: [],
+  loading: false,
+  error: null,
+};
+
+const parentSlice = createSlice({
+  name: 'parents',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchParents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchParents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.list = action.payload;
+      })
+      .addCase(fetchParents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(addParent.fulfilled, (state, action) => {
+        state.list.push(action.payload);
+      })
+      .addCase(updateParent.fulfilled, (state, action) => {
+        const index = state.list.findIndex(p => p.id === action.payload.id);
+        if (index !== -1) {
+          state.list[index] = action.payload;
+        }
+      })
+      .addCase(deleteParent.fulfilled, (state, action) => {
+        state.list = state.list.filter(p => p.id !== action.payload);
+      });
+  },
+});
+
 export const updateParent = createAsyncThunk(
   'parents/updateParent',
   async ({ id, data }, { rejectWithValue }) => {
     try {
       const response = await api.put(`/parents/${id}`, data);
       toast.success('Parent updated successfully');
-      return response.data.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update parent');
       return rejectWithValue(error.response?.data?.message);
@@ -55,35 +94,5 @@ export const deleteParent = createAsyncThunk(
     }
   }
 );
-
-const initialState = { list: [], loading: false, error: null };
-
-const parentSlice = createSlice({
-  name: 'parents',
-  initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchParents.pending, (state) => { state.loading = true; })
-      .addCase(fetchParents.fulfilled, (state, action) => {
-        state.loading = false;
-        state.list = action.payload;
-      })
-      .addCase(fetchParents.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(addParent.fulfilled, (state, action) => {
-        state.list.push(action.payload);
-      })
-      .addCase(updateParent.fulfilled, (state, action) => {
-        const index = state.list.findIndex(p => p.id === action.payload.id);
-        if (index !== -1) state.list[index] = action.payload;
-      })
-      .addCase(deleteParent.fulfilled, (state, action) => {
-        state.list = state.list.filter(p => p.id !== action.payload);
-      });
-  },
-});
 
 export default parentSlice.reducer;

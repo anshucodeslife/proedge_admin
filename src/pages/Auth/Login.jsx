@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AuthLayout } from '../../layouts/AuthLayout';
@@ -12,7 +12,13 @@ export const Login = () => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { loading } = useSelector((state) => state.auth);
+  const { loading, isAuthenticated } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -31,19 +37,19 @@ export const Login = () => {
   return (
     <AuthLayout title="Welcome back" subtitle="Sign in to Proedge Learning Admin">
       <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-        <InputField 
-          id="email" 
-          type="email" 
-          label="Email address" 
-          placeholder="admin@proedge.com" 
+        <InputField
+          id="email"
+          type="email"
+          label="Email address"
+          placeholder="admin@proedge.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <InputField 
-          id="password" 
-          type="password" 
-          label="Password" 
-          placeholder="password" 
+        <InputField
+          id="password"
+          type="password"
+          label="Password"
+          placeholder="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />

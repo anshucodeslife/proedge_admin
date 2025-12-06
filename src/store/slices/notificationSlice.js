@@ -7,7 +7,7 @@ export const fetchNotifications = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/notifications');
-      return response.data.data;
+      return response.data.data?.notifications || response.data.data || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch notifications');
     }
@@ -18,9 +18,9 @@ export const sendNotification = createAsyncThunk(
   'notifications/sendNotification',
   async (notificationData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/notifications', notificationData);
+      const response = await api.post('/notifications/send', notificationData);
       toast.success('Notification sent successfully');
-      return response.data.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to send notification');
       return rejectWithValue(error.response?.data?.message);
@@ -28,14 +28,16 @@ export const sendNotification = createAsyncThunk(
   }
 );
 
-export const markNotificationRead = createAsyncThunk(
-  'notifications/markRead',
+export const deleteNotification = createAsyncThunk(
+  'notifications/deleteNotification',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await api.patch(`/notifications/${id}/read`);
-      return response.data.data;
+      await api.delete(`/notifications/${id}`);
+      toast.success('Notification deleted');
+      return id;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to mark as read');
+      toast.error(error.response?.data?.message || 'Failed to delete notification');
+      return rejectWithValue(error.response?.data?.message);
     }
   }
 );
@@ -52,7 +54,10 @@ const notificationSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchNotifications.pending, (state) => { state.loading = true; })
+      .addCase(fetchNotifications.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchNotifications.fulfilled, (state, action) => {
         state.loading = false;
         state.list = action.payload;
@@ -64,9 +69,8 @@ const notificationSlice = createSlice({
       .addCase(sendNotification.fulfilled, (state, action) => {
         state.list.unshift(action.payload);
       })
-      .addCase(markNotificationRead.fulfilled, (state, action) => {
-        const index = state.list.findIndex(n => n.id === action.payload.id);
-        if (index !== -1) state.list[index] = action.payload;
+      .addCase(deleteNotification.fulfilled, (state, action) => {
+        state.list = state.list.filter(n => n.id !== action.payload);
       });
   },
 });

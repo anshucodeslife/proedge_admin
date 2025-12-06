@@ -7,7 +7,7 @@ export const fetchBatches = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/lms/batches');
-      return response.data.data;
+      return response.data.data?.batches || response.data.data || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch batches');
     }
@@ -20,7 +20,7 @@ export const addBatch = createAsyncThunk(
     try {
       const response = await api.post('/lms/batches', batchData);
       toast.success('Batch created successfully');
-      return response.data.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to create batch');
       return rejectWithValue(error.response?.data?.message);
@@ -34,7 +34,7 @@ export const updateBatch = createAsyncThunk(
     try {
       const response = await api.put(`/lms/batches/${id}`, data);
       toast.success('Batch updated successfully');
-      return response.data.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update batch');
       return rejectWithValue(error.response?.data?.message);

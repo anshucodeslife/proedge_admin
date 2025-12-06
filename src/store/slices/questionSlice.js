@@ -7,7 +7,7 @@ export const fetchQuestions = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/questions');
-      return response.data.data;
+      return response.data.data?.questions || response.data.data || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch questions');
     }
@@ -20,7 +20,7 @@ export const addQuestion = createAsyncThunk(
     try {
       const response = await api.post('/questions', questionData);
       toast.success('Question added successfully');
-      return response.data.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add question');
       return rejectWithValue(error.response?.data?.message);
@@ -28,13 +28,52 @@ export const addQuestion = createAsyncThunk(
   }
 );
 
+const initialState = {
+  list: [],
+  loading: false,
+  error: null,
+};
+
+const questionSlice = createSlice({
+  name: 'questions',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchQuestions.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchQuestions.fulfilled, (state, action) => {
+        state.loading = false;
+        state.list = action.payload;
+      })
+      .addCase(fetchQuestions.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(addQuestion.fulfilled, (state, action) => {
+        state.list.push(action.payload);
+      })
+      .addCase(updateQuestion.fulfilled, (state, action) => {
+        const index = state.list.findIndex(q => q.id === action.payload.id);
+        if (index !== -1) {
+          state.list[index] = action.payload;
+        }
+      })
+      .addCase(deleteQuestion.fulfilled, (state, action) => {
+        state.list = state.list.filter(q => q.id !== action.payload);
+      });
+  },
+});
+
 export const updateQuestion = createAsyncThunk(
   'questions/updateQuestion',
   async ({ id, data }, { rejectWithValue }) => {
     try {
       const response = await api.put(`/questions/${id}`, data);
       toast.success('Question updated successfully');
-      return response.data.data;
+      return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update question');
       return rejectWithValue(error.response?.data?.message);
@@ -55,35 +94,5 @@ export const deleteQuestion = createAsyncThunk(
     }
   }
 );
-
-const initialState = { list: [], loading: false, error: null };
-
-const questionSlice = createSlice({
-  name: 'questions',
-  initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchQuestions.pending, (state) => { state.loading = true; })
-      .addCase(fetchQuestions.fulfilled, (state, action) => {
-        state.loading = false;
-        state.list = action.payload;
-      })
-      .addCase(fetchQuestions.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(addQuestion.fulfilled, (state, action) => {
-        state.list.push(action.payload);
-      })
-      .addCase(updateQuestion.fulfilled, (state, action) => {
-        const index = state.list.findIndex(q => q.id === action.payload.id);
-        if (index !== -1) state.list[index] = action.payload;
-      })
-      .addCase(deleteQuestion.fulfilled, (state, action) => {
-        state.list = state.list.filter(q => q.id !== action.payload);
-      });
-  },
-});
 
 export default questionSlice.reducer;

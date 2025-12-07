@@ -18,14 +18,14 @@ export const EnrollmentList = () => {
   const courses = useSelector(state => state.courses.list);
   const batches = useSelector(state => state.batches.list);
   const dispatch = useDispatch();
-  
+
   React.useEffect(() => {
     dispatch(fetchEnrollments());
     dispatch(fetchStudents());
     dispatch(fetchBatches());
     dispatch(fetchCourses());
   }, [dispatch]);
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ studentId: '', courseId: '', batchId: '' });
 
@@ -79,19 +79,19 @@ export const EnrollmentList = () => {
             <tbody className="divide-y divide-slate-100">
               {enrollments.map((enrollment) => (
                 <tr key={enrollment.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 font-medium text-slate-800">{enrollment.studentName}</td>
-                  <td className="px-6 py-4">{enrollment.courseName}</td>
-                  <td className="px-6 py-4">{enrollment.batchName}</td>
-                  <td className="px-6 py-4 text-slate-500">{enrollment.date}</td>
-                  <td className="px-6 py-4"><Badge variant="primary">{enrollment.status}</Badge></td>
+                  <td className="px-6 py-4 font-medium text-slate-800">{enrollment.user?.fullName || 'Unknown Student'}</td>
+                  <td className="px-6 py-4">{enrollment.course?.title || 'Unknown Course'}</td>
+                  <td className="px-6 py-4">{enrollment.batch?.name || 'Self-Paced'}</td>
+                  <td className="px-6 py-4 text-slate-500">{new Date(enrollment.enrolledAt).toLocaleDateString()}</td>
+                  <td className="px-6 py-4"><Badge variant={enrollment.status === 'ACTIVE' ? 'success' : 'neutral'}>{enrollment.status}</Badge></td>
                   <td className="px-6 py-4 text-right">
-                     <button 
-                        onClick={() => handleDelete(enrollment.id)}
-                        className="p-1 text-slate-400 hover:text-red-600 transition-colors"
-                        title="Unenroll"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                    <button
+                      onClick={() => handleDelete(enrollment.id)}
+                      className="p-1 text-slate-400 hover:text-red-600 transition-colors"
+                      title="Unenroll"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -102,23 +102,23 @@ export const EnrollmentList = () => {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Enroll Student">
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <SelectField 
-            label="Student" 
-            value={formData.studentId} 
-            onChange={(e) => setFormData({...formData, studentId: e.target.value})} 
-            options={students.map(s => ({ value: s.id, label: s.name }))} 
+          <SelectField
+            label="Student"
+            value={formData.studentId}
+            onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
+            options={students.map(s => ({ value: s.id, label: s.name }))}
           />
-          <SelectField 
-            label="Course" 
-            value={formData.courseId} 
-            onChange={(e) => setFormData({...formData, courseId: e.target.value})} 
-            options={courses.map(c => ({ value: c.id, label: c.title }))} 
+          <SelectField
+            label="Course"
+            value={formData.courseId}
+            onChange={(e) => setFormData({ ...formData, courseId: e.target.value })}
+            options={courses.map(c => ({ value: c.id, label: c.title }))}
           />
-          <SelectField 
-            label="Batch" 
-            value={formData.batchId} 
-            onChange={(e) => setFormData({...formData, batchId: e.target.value})} 
-            options={batches.map(b => ({ value: b.id, label: b.name }))} 
+          <SelectField
+            label="Batch"
+            value={formData.batchId}
+            onChange={(e) => setFormData({ ...formData, batchId: e.target.value })}
+            options={batches.map(b => ({ value: b.id, label: b.name }))}
           />
           <div className="pt-4">
             <Button className="w-full">Enroll Student</Button>

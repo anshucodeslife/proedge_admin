@@ -88,7 +88,7 @@ export const BatchesList = () => {
                   <th className="p-4 text-left">Batch Name</th>
                   <th className="p-4 text-left">Course</th>
                   <th className="p-4 text-left">Tutor</th>
-                  <th className="p-4 text-left">Schedule</th>
+                  {/* <th className="p-4 text-left">Schedule</th> */}
                   <th className="p-4 text-left">Duration</th>
                   <th className="p-4 text-left">Students</th>
                   <th className="p-4 text-right">Actions</th>
@@ -100,9 +100,9 @@ export const BatchesList = () => {
                     <td className="p-4 font-medium">{batch.name}</td>
                     <td className="p-4">{batch.course?.title || 'N/A'}</td>
                     <td className="p-4">{batch.tutorName}</td>
-                    <td className="p-4">
+                    {/* <td className="p-4">
                       <Badge variant="neutral">{batch.schedule}</Badge>
-                    </td>
+                    </td> */}
                     <td className="p-4 text-sm text-gray-600">
                       {batch.startDate && new Date(batch.startDate).toLocaleDateString()} - {batch.endDate && new Date(batch.endDate).toLocaleDateString()}
                     </td>

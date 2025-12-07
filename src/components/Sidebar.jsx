@@ -1,17 +1,20 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  BookOpen, 
-  Calendar, 
-  Settings, 
-  LogOut, 
-  UserCheck, 
-  HelpCircle, 
+import {
+  LayoutDashboard,
+  Users,
+  BookOpen,
+  Calendar,
+  Settings,
+  LogOut,
+  UserCheck,
+  HelpCircle,
   Baby,
   School,
-  X
+  Activity,
+  Award, // For Referrals
+  ShieldAlert, // For Logs
+  ChevronLeft
 } from 'lucide-react';
 import { Logo } from './ui/Logo';
 
@@ -20,6 +23,10 @@ const menuItems = [
   { path: '/students', icon: Users, label: 'Students' },
   { path: '/courses', icon: BookOpen, label: 'Courses' },
   { path: '/academics', icon: School, label: 'Modules & Lessons' },
+  { path: '/enquiries', icon: Users, label: 'Enquiries' },
+  { path: '/referrals', icon: Award, label: 'Referrals' },
+  { path: '/logs', icon: ShieldAlert, label: 'Audit Logs' },
+  { path: '/admissions', icon: UserCheck, label: 'Batch 1 Admissions' },
   { path: '/batches', icon: Users, label: 'Batches' },
   { path: '/enrollments', icon: UserCheck, label: 'Enrollments' },
   { path: '/attendance', icon: Calendar, label: 'Attendance' },
@@ -39,40 +46,40 @@ export const Sidebar = ({ isSidebarOpen, setSidebarOpen, isMobileOpen, setMobile
         {isSidebarOpen ? (
           <div className="flex items-center justify-between w-full">
             <Logo />
-            <button onClick={() => setSidebarOpen(false)} className="hidden md:block text-slate-400 hover:text-indigo-600">
-              <X size={20} />
+            <button onClick={() => setSidebarOpen(false)} className="hidden md:block text-slate-400 hover:text-indigo-600 bg-slate-50 hover:bg-slate-100 p-1 rounded-lg transition-colors">
+              <ChevronLeft size={20} />
             </button>
           </div>
         ) : (
           <div className="w-full flex justify-center cursor-pointer" onClick={() => setSidebarOpen(true)}>
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold">P</div>
+            <img src="/proedge_logo.png" alt="Proedge" className="w-10 h-10 object-contain" />
           </div>
         )}
       </div>
 
       <div className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
-         {menuItems.map((item) => (
-           <NavLink 
-             key={item.path}
-             to={item.path}
-             onClick={() => setMobileOpen(false)}
-             className={({ isActive }) => `
+        {menuItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            onClick={() => setMobileOpen(false)}
+            className={({ isActive }) => `
                flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition-all duration-200
-               ${isActive 
-                 ? 'bg-indigo-50 text-indigo-600 font-semibold' 
-                 : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-               }
+               ${isActive
+                ? 'bg-indigo-50 text-indigo-600 font-semibold'
+                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+              }
                ${!isSidebarOpen && 'justify-center'}
              `}
-           >
-             <item.icon size={20} />
-             {isSidebarOpen && <span className="text-sm">{item.label}</span>}
-           </NavLink>
-         ))}
+          >
+            <item.icon size={20} />
+            {isSidebarOpen && <span className="text-sm">{item.label}</span>}
+          </NavLink>
+        ))}
       </div>
 
       <div className="p-4 border-t border-slate-50">
-        <button 
+        <button
           onClick={onLogout}
           className={`flex items-center gap-3 px-4 py-3 w-full text-slate-500 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors ${!isSidebarOpen && 'justify-center'}`}
         >

@@ -4,6 +4,10 @@ import { AdminLayout } from '../layouts/AdminLayout';
 import { Login } from '../pages/Auth/Login';
 import { Dashboard } from '../pages/Dashboard/Dashboard';
 import { StudentsList } from '../pages/Students/StudentsList';
+import Enquiries from '../pages/Enquiries/Enquiries';
+import Logs from '../pages/Logs/Logs';
+import Referrals from '../pages/Referrals/Referrals';
+import Batch1Admissions from '../pages/Admissions/Batch1Admissions';
 import { CoursesList } from '../pages/Courses/CoursesList';
 import { ModulesList } from '../pages/Modules/ModulesList';
 import { BatchesList } from '../pages/Batches/BatchesList';
@@ -23,6 +27,10 @@ export const AppRouter = () => {
       <Route path="/" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="students" element={<StudentsList />} />
+        <Route path="enquiries" element={<Enquiries />} />
+        <Route path="logs" element={<Logs />} />
+        <Route path="referrals" element={<Referrals />} />
+        <Route path="admissions" element={<Batch1Admissions />} />
         <Route path="courses" element={<CoursesList />} />
         <Route path="academics" element={<ModulesList />} /> {/* Using Modules as Academics/Syllabus for now as per menu */}
         <Route path="batches" element={<BatchesList />} />
@@ -31,7 +39,7 @@ export const AppRouter = () => {
         <Route path="notifications" element={<NotificationList />} />
         <Route path="payments" element={<PaymentsList />} />
         <Route path="settings" element={<ProfileSettings />} />
-        
+
         {/* Mapped routes based on Sidebar menu items */}
         <Route path="staff" element={<StaffList />} />
         <Route path="parents" element={<ParentsList />} />

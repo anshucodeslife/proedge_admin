@@ -7,7 +7,7 @@ export const fetchModules = createAsyncThunk(
   async (courseId, { rejectWithValue }) => {
     try {
       const response = await api.get('/lms/modules', { params: { courseId } });
-      return response.data.data?.modules || [];
+      return Array.isArray(response.data.data) ? response.data.data : (response.data.data?.modules || []);
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch modules');
     }

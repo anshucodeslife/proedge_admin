@@ -19,12 +19,17 @@ export const NotificationList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ title: '', message: '', userId: '', type: 'IN_APP' });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(sendNotification(formData));
-    toast.success('Notification sent successfully');
-    setIsModalOpen(false);
-    setFormData({ title: '', message: '', userId: '', type: 'IN_APP' });
+    try {
+      await dispatch(sendNotification(formData)).unwrap();
+      // Slice handles success toast
+      setIsModalOpen(false);
+      setFormData({ title: '', message: '', userId: '', type: 'IN_APP' });
+    } catch (error) {
+      // Slice handles error toast
+      console.error('Failed to send notification:', error);
+    }
   };
 
   const handleDelete = (id) => {
@@ -56,7 +61,7 @@ export const NotificationList = () => {
                 <span>{notification.date}</span>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => handleDelete(notification.id)}
               className="text-slate-400 hover:text-red-500 transition-colors p-2"
             >
@@ -68,27 +73,27 @@ export const NotificationList = () => {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Send Notification">
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <InputField label="Title" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} placeholder="Announcement Title" />
+          <InputField label="Title" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="Announcement Title" />
           <div className="grid grid-cols-2 gap-4">
-             <InputField label="User ID" value={formData.userId} onChange={(e) => setFormData({...formData, userId: e.target.value})} placeholder="STU001" />
-             <SelectField 
-              label="Type" 
-              value={formData.type} 
-              onChange={(e) => setFormData({...formData, type: e.target.value})} 
+            <InputField label="User ID" value={formData.userId} onChange={(e) => setFormData({ ...formData, userId: e.target.value })} placeholder="STU001" />
+            <SelectField
+              label="Type"
+              value={formData.type}
+              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
               options={[
                 { value: 'IN_APP', label: 'In-App' },
                 { value: 'EMAIL', label: 'Email' },
                 { value: 'SMS', label: 'SMS' }
-              ]} 
+              ]}
             />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-slate-700">Message</label>
-            <textarea 
+            <textarea
               className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-slate-600 text-sm"
               rows="4"
               value={formData.message}
-              onChange={(e) => setFormData({...formData, message: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               placeholder="Type your message here..."
             ></textarea>
           </div>

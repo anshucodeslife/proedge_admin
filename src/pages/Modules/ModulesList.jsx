@@ -57,10 +57,10 @@ export const ModulesList = () => {
     if (editingModule) {
       dispatch(updateModule({
         id: editingModule.id,
-        data: { ...moduleForm, courseId: Number(moduleForm.courseId), order: Number(moduleForm.order) }
+        data: { ...moduleForm, courseId: moduleForm.courseId, order: Number(moduleForm.order) }
       }));
     } else {
-      dispatch(addModule({ ...moduleForm, courseId: Number(moduleForm.courseId), order: Number(moduleForm.order) }));
+      dispatch(addModule({ ...moduleForm, courseId: moduleForm.courseId, order: Number(moduleForm.order) }));
     }
     setIsModuleModalOpen(false);
     setModuleForm({ title: '', courseId: '', order: '' });
@@ -100,8 +100,10 @@ export const ModulesList = () => {
       }));
     } else {
       dispatch(addLesson({
+        ...lessonForm,
         moduleId: selectedModuleId,
-        lesson: { ...lessonForm, durationSec: Number(lessonForm.durationSec), order: Number(lessonForm.order) }
+        durationSec: Number(lessonForm.durationSec),
+        order: Number(lessonForm.order)
       }));
     }
     setIsLessonModalOpen(false);

@@ -6,7 +6,7 @@ import { Badge } from '../../components/ui/Badge';
 import { fetchPayments } from '../../store/slices/paymentSlice';
 
 export const PaymentsList = () => {
-  const payments = useSelector(state => state.payments.list);
+  const payments = useSelector(state => state.payments.transactions);
   const loading = useSelector(state => state.payments.loading);
   const dispatch = useDispatch();
 
@@ -85,7 +85,7 @@ export const PaymentsList = () => {
                       </div>
                     </td>
                     <td className="p-4">
-                      <Badge variant="neutral">{payment.paymentMethod || 'Online'}</Badge>
+                      <Badge variant="neutral" className="uppercase">{payment.provider || payment.paymentMethod || 'Online'}</Badge>
                     </td>
                     <td className="p-4 text-sm text-gray-600">
                       {new Date(payment.createdAt).toLocaleDateString()}

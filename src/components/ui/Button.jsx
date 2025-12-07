@@ -6,9 +6,10 @@ export const Button = ({ children, onClick, variant = 'primary', className = "",
     primary: "bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-200",
     outline: "border border-slate-200 text-slate-600 hover:bg-slate-50",
     ghost: "text-slate-600 hover:bg-slate-50",
-    danger: "bg-red-50 text-red-600 hover:bg-red-100"
+    danger: "bg-red-50 text-red-600 hover:bg-red-100",
+    success: "bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm shadow-emerald-200"
   };
-  
+
   return (
     <button onClick={onClick} className={`${baseStyles} ${variants[variant]} ${className}`}>
       {Icon && <Icon size={18} />}

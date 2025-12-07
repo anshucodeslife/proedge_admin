@@ -17,13 +17,24 @@ export const FileUpload = ({ label, folder, accept, onUploadComplete, initialVal
 
         try {
             // 1. Get Signed URL
-            const { data } = await api.post('/upload/signed-url', {
+            console.log('Requesting signed URL for:', file.name, file.type);
+            const response = await api.post('/upload/signed-url', {
                 fileName: file.name,
                 fileType: file.type,
                 folder: folder || 'general'
             });
 
+            console.log('Backup API Response:', response);
+            const { data } = response;
+            console.log('Inner Data:', data);
+
+            if (!data || !data.data || !data.data.uploadUrl) {
+                console.error('Invalid response structure:', data);
+                throw new Error('Failed to retrieve upload configuration');
+            }
+
             const { uploadUrl, key } = data.data;
+            console.log('Got Upload URL:', uploadUrl);
 
             // 2. Upload to S3 using standard fetch (bypass axios interceptors to avoid auth headers on S3)
             const uploadRes = await fetch(uploadUrl, {
@@ -35,15 +46,17 @@ export const FileUpload = ({ label, folder, accept, onUploadComplete, initialVal
             });
 
             if (!uploadRes.ok) {
+                console.error('S3 Upload Failed:', uploadRes.status, uploadRes.statusText);
                 throw new Error('Failed to upload file to storage');
             }
 
             // 3. Success
+            console.log('Upload Successful, Key:', key);
             setUploadedKey(key);
             onUploadComplete(key); // Return key to parent form
 
         } catch (err) {
-            console.error(err);
+            console.error('Upload Process Error:', err);
             setError(err.message || 'Upload failed');
         } finally {
             setUploading(false);

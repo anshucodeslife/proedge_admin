@@ -1,6 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import studentReducer from './slices/studentSlice';
+import enquiryReducer from './slices/enquirySlice';
+import referralReducer from './slices/referralSlice';
+import logReducer from './slices/logSlice';
+import admissionReducer from './slices/admissionSlice';
 import courseReducer from './slices/courseSlice';
 import moduleReducer from './slices/moduleSlice';
 import batchReducer from './slices/batchSlice';
@@ -17,6 +21,10 @@ export const store = configureStore({
   reducer: {
     auth: authReducer,
     students: studentReducer,
+    enquiries: enquiryReducer,
+    referrals: referralReducer,
+    logs: logReducer,
+    admissions: admissionReducer,
     courses: courseReducer,
     modules: moduleReducer,
     batches: batchReducer,

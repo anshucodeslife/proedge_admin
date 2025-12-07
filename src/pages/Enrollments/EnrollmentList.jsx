@@ -78,7 +78,7 @@ export const EnrollmentList = () => {
         </div>
         <div className="flex gap-3">
           <Button onClick={() => setIsAssignmentModalOpen(true)} icon={UserPlus} variant="secondary">Assign Course</Button>
-          <Button onClick={() => setIsModalOpen(true)} icon={Plus}>New Enrollment</Button>
+          {/* <Button onClick={() => setIsModalOpen(true)} icon={Plus}>New Enrollment</Button> */}
         </div>
       </div>
 
@@ -100,7 +100,7 @@ export const EnrollmentList = () => {
                 <tr>
                   <th className="px-6 py-4">Student Name</th>
                   <th className="px-6 py-4">Course</th>
-                  <th className="px-6 py-4">Batch</th>
+                  {/* <th className="px-6 py-4">Batch</th> */}
                   <th className="px-6 py-4">Date</th>
                   <th className="px-6 py-4">Status</th>
                   <th className="px-6 py-4 text-right">Actions</th>
@@ -111,7 +111,7 @@ export const EnrollmentList = () => {
                   <tr key={enrollment.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4 font-medium text-slate-800">{enrollment.user?.fullName || 'Unknown Student'}</td>
                     <td className="px-6 py-4">{enrollment.course?.title || 'Unknown Course'}</td>
-                    <td className="px-6 py-4">{enrollment.batch?.name || 'Self-Paced'}</td>
+                    {/* <td className="px-6 py-4">{enrollment.batch?.name || 'Self-Paced'}</td> */}
                     <td className="px-6 py-4 text-slate-500">{enrollment.enrolledAt ? new Date(enrollment.enrolledAt).toLocaleDateString() : 'N/A'}</td>
                     <td className="px-6 py-4"><Badge variant={enrollment.status === 'ACTIVE' ? 'success' : 'neutral'}>{enrollment.status}</Badge></td>
                     <td className="px-6 py-4 text-right">

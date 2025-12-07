@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, UserPlus } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
@@ -10,6 +10,7 @@ import { enrollStudent, fetchEnrollments, deleteEnrollment } from '../../store/s
 import { fetchStudents } from '../../store/slices/studentSlice';
 import { fetchCourses } from '../../store/slices/courseSlice';
 import { fetchBatches } from '../../store/slices/batchSlice';
+import CourseAssignmentModal from '../../components/modals/CourseAssignmentModal';
 import toast from 'react-hot-toast';
 
 export const EnrollmentList = () => {
@@ -27,6 +28,7 @@ export const EnrollmentList = () => {
   }, [dispatch]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAssignmentModalOpen, setIsAssignmentModalOpen] = useState(false);
   const [formData, setFormData] = useState({ studentId: '', courseId: '', batchId: '' });
 
   const handleSubmit = (e) => {
@@ -60,7 +62,10 @@ export const EnrollmentList = () => {
           <h2 className="text-2xl font-bold text-slate-800">Enrollments</h2>
           <p className="text-slate-500 text-sm">Manage student course enrollments</p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)} icon={Plus}>New Enrollment</Button>
+        <div className="flex gap-3">
+          <Button onClick={() => setIsAssignmentModalOpen(true)} icon={UserPlus} variant="secondary">Assign Course</Button>
+          <Button onClick={() => setIsModalOpen(true)} icon={Plus}>New Enrollment</Button>
+        </div>
       </div>
 
       <Card>
@@ -125,6 +130,16 @@ export const EnrollmentList = () => {
           </div>
         </form>
       </Modal>
+
+      <CourseAssignmentModal
+        isOpen={isAssignmentModalOpen}
+        onClose={() => setIsAssignmentModalOpen(false)}
+        courses={courses}
+        onSuccess={() => {
+          dispatch(fetchEnrollments());
+          toast.success('Course assigned successfully!');
+        }}
+      />
     </div>
   );
 };

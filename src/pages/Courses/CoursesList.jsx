@@ -162,7 +162,7 @@ export const CoursesList = () => {
                     <td className="px-6 py-4 font-medium text-slate-800">
                       <div className="flex items-center gap-3">
                         {course.thumbnail ? (
-                          <img src={`https://pub-4204e3e1d6704bdd88e330c6a5a04686.r2.dev/${course.thumbnail}`} alt="" className="w-10 h-10 rounded object-cover" />
+                          <img src={`https://proedge-lms.s3.ap-south-1.amazonaws.com/${course.thumbnail}`} alt="" className="w-10 h-10 rounded object-cover" />
                         ) : (
                           <div className="w-10 h-10 bg-slate-100 rounded flex items-center justify-center font-bold text-slate-400">
                             {course.title?.substring(0, 2).toUpperCase()}
@@ -297,7 +297,7 @@ export const CoursesList = () => {
             <div className="p-6 overflow-y-auto space-y-4">
               {selectedCourse.thumbnail && (
                 <div className="w-full h-48 rounded-lg overflow-hidden bg-slate-100">
-                  <img src={`https://pub-4204e3e1d6704bdd88e330c6a5a04686.r2.dev/${selectedCourse.thumbnail}`} alt={selectedCourse.title} className="w-full h-full object-cover" />
+                  <img src={`https://proedge-lms.s3.ap-south-1.amazonaws.com/${selectedCourse.thumbnail}`} alt={selectedCourse.title} className="w-full h-full object-cover" />
                 </div>
               )}
 

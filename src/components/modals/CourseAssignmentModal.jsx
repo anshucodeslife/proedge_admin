@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, UserPlus } from 'lucide-react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 const CourseAssignmentModal = ({ isOpen, onClose, onSuccess, courses = [] }) => {
     const [selectedCourse, setSelectedCourse] = useState('');
@@ -56,7 +57,7 @@ const CourseAssignmentModal = ({ isOpen, onClose, onSuccess, courses = [] }) => 
 
     const handleAssign = async () => {
         if (!selectedCourse || selectedStudents.length === 0) {
-            alert('Please select a course and at least one student');
+            Swal.fire('Error', 'Please select a course and at least one student', 'error');
             return;
         }
 
@@ -66,12 +67,12 @@ const CourseAssignmentModal = ({ isOpen, onClose, onSuccess, courses = [] }) => 
                 userIds: selectedStudents.map(s => s.id),
             });
 
-            alert(`Successfully assigned course to ${res.data.data.success?.length || 0} students`);
+            Swal.fire('Success', `Successfully assigned course to ${res.data.data.success?.length || 0} students`, 'success');
             onSuccess();
             handleClose();
         } catch (error) {
             console.error('Error assigning course:', error);
-            alert('Failed to assign course');
+            Swal.fire('Error', 'Failed to assign course', 'error');
         } finally {
             setLoading(false);
         }

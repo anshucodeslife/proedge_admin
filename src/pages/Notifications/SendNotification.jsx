@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Send, Users, User, BookOpen, Mail, Bell } from 'lucide-react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 const SendNotification = () => {
     const [title, setTitle] = useState('');
@@ -43,7 +44,7 @@ const SendNotification = () => {
 
     const handleSend = async () => {
         if (!title || !message) {
-            alert('Please fill in title and message');
+            Swal.fire('Error', 'Please fill in title and message', 'error');
             return;
         }
 
@@ -67,14 +68,14 @@ const SendNotification = () => {
                 sendEmail,
             });
 
-            alert('Notification sent successfully!');
+            Swal.fire('Success', 'Notification sent successfully!', 'success');
             setTitle('');
             setMessage('');
             setSelectedUsers([]);
             setShowPreview(false);
         } catch (error) {
             console.error('Error sending notification:', error);
-            alert('Failed to send notification');
+            Swal.fire('Error', 'Failed to send notification', 'error');
         } finally {
             setLoading(false);
         }

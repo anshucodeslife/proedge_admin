@@ -8,6 +8,7 @@ import { Modal } from '../../components/ui/Modal';
 import { InputField } from '../../components/ui/InputField';
 import { addStaff, fetchStaff, updateStaff, deleteStaff } from '../../store/slices/staffSlice';
 import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 export const StaffList = () => {
   const staff = useSelector(state => state.staff.list);
@@ -47,8 +48,18 @@ export const StaffList = () => {
     setEditingStaff(null);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this staff member?')) {
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this staff member?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
       dispatch(deleteStaff(id));
     }
   };
@@ -78,22 +89,22 @@ export const StaffList = () => {
               </div>
               <Badge variant="neutral">{member.subject}</Badge>
             </div>
-             <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
-                  onClick={() => openModal(member)}
-                  className="p-1.5 bg-white rounded-full text-slate-400 hover:text-indigo-600 shadow-sm border border-slate-100"
-                  title="Edit"
-                >
-                  <Edit size={14} />
-                </button>
-                <button 
-                  onClick={() => handleDelete(member.id)}
-                  className="p-1.5 bg-white rounded-full text-slate-400 hover:text-red-600 shadow-sm border border-slate-100"
-                  title="Delete"
-                >
-                  <Trash2 size={14} />
-                </button>
-             </div>
+            <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={() => openModal(member)}
+                className="p-1.5 bg-white rounded-full text-slate-400 hover:text-indigo-600 shadow-sm border border-slate-100"
+                title="Edit"
+              >
+                <Edit size={14} />
+              </button>
+              <button
+                onClick={() => handleDelete(member.id)}
+                className="p-1.5 bg-white rounded-full text-slate-400 hover:text-red-600 shadow-sm border border-slate-100"
+                title="Delete"
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
             <div className="space-y-2 text-sm text-slate-600">
               <div className="flex items-center gap-2">
                 <Mail size={16} className="text-slate-400" />
@@ -110,10 +121,10 @@ export const StaffList = () => {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingStaff ? "Edit Staff Member" : "Add Staff Member"}>
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <InputField label="Name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
-          <InputField label="Email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
-          <InputField label="Role" value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})} />
-          <InputField label="Subject" value={formData.subject} onChange={(e) => setFormData({...formData, subject: e.target.value})} />
+          <InputField label="Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+          <InputField label="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+          <InputField label="Role" value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} />
+          <InputField label="Subject" value={formData.subject} onChange={(e) => setFormData({ ...formData, subject: e.target.value })} />
           <div className="pt-4">
             <Button className="w-full">{editingStaff ? "Update Staff" : "Add Staff"}</Button>
           </div>

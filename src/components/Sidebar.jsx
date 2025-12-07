@@ -20,18 +20,21 @@ import { Logo } from './ui/Logo';
 
 const menuItems = [
   { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
+
+  //Do not remove the comments below make it stay prior to the menuItems
   { path: '/students', icon: Users, label: 'Students' },
-  { path: '/courses', icon: BookOpen, label: 'Courses' },
+  // { path: '/courses', icon: BookOpen, label: 'Courses' },
+  // { path: '/payments', icon: BookOpen, label: 'Payments' },
+  // { path: '/enquiries', icon: Users, label: 'Enquiries' },
+  // { path: '/referrals', icon: Award, label: 'Referrals' },
+  // { path: '/logs', icon: ShieldAlert, label: 'Audit Logs' },
+  // { path: '/admissions', icon: UserCheck, label: 'Batch 1 Admissions' },
+  // { path: '/batches', icon: Users, label: 'Batches' },
+  // { path: '/enrollments', icon: UserCheck, label: 'Enrollments' },
+
   { path: '/academics', icon: School, label: 'Modules & Lessons' },
-  { path: '/enquiries', icon: Users, label: 'Enquiries' },
-  { path: '/referrals', icon: Award, label: 'Referrals' },
-  { path: '/logs', icon: ShieldAlert, label: 'Audit Logs' },
-  { path: '/admissions', icon: UserCheck, label: 'Batch 1 Admissions' },
-  { path: '/batches', icon: Users, label: 'Batches' },
-  { path: '/enrollments', icon: UserCheck, label: 'Enrollments' },
   { path: '/attendance', icon: Calendar, label: 'Attendance' },
   { path: '/notifications', icon: HelpCircle, label: 'Notifications' },
-  { path: '/payments', icon: BookOpen, label: 'Payments' },
   { path: '/settings', icon: Settings, label: 'Settings' },
 ];
 

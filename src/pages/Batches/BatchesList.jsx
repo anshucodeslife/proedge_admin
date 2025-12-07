@@ -9,6 +9,7 @@ import { InputField } from '../../components/ui/InputField';
 import { SelectField } from '../../components/ui/SelectField';
 import { fetchBatches, addBatch, updateBatch, deleteBatch } from '../../store/slices/batchSlice';
 import { fetchCourses } from '../../store/slices/courseSlice';
+import Swal from 'sweetalert2';
 
 export const BatchesList = () => {
   const batches = useSelector(state => state.batches.list);
@@ -54,7 +55,17 @@ export const BatchesList = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this batch?')) {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this batch?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
       await dispatch(deleteBatch(id));
       dispatch(fetchBatches());
     }

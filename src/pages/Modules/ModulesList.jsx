@@ -11,6 +11,7 @@ import { FileUpload } from '../../components/ui/FileUpload';
 import { addModule, addLesson, fetchModules, updateModule, deleteModule, updateLesson, deleteLesson } from '../../store/slices/moduleSlice';
 import { fetchCourses } from '../../store/slices/courseSlice';
 import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 export const ModulesList = () => {
   const modules = useSelector(state => state.modules.list);
@@ -67,8 +68,18 @@ export const ModulesList = () => {
     setEditingModule(null);
   };
 
-  const handleDeleteModule = (id) => {
-    if (window.confirm('Are you sure you want to delete this module and all its lessons?')) {
+  const handleDeleteModule = async (id) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'This will delete the module and all its lessons!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
       dispatch(deleteModule(id));
     }
   };
@@ -111,8 +122,18 @@ export const ModulesList = () => {
     setEditingLesson(null);
   };
 
-  const handleDeleteLesson = (moduleId, lessonId) => {
-    if (window.confirm('Are you sure you want to delete this lesson?')) {
+  const handleDeleteLesson = async (moduleId, lessonId) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this lesson?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
       dispatch(deleteLesson({ moduleId, lessonId }));
     }
   };

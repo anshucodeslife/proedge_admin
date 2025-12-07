@@ -12,6 +12,7 @@ import { fetchCourses } from '../../store/slices/courseSlice';
 import { fetchBatches } from '../../store/slices/batchSlice';
 import CourseAssignmentModal from '../../components/modals/CourseAssignmentModal';
 import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 export const EnrollmentList = () => {
   const enrollments = useSelector(state => state.enrollments.list);
@@ -49,8 +50,18 @@ export const EnrollmentList = () => {
     }
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to unenroll this student?')) {
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to unenroll this student?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, unenroll!'
+    });
+
+    if (result.isConfirmed) {
       dispatch(deleteEnrollment(id));
     }
   };

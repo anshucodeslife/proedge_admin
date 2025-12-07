@@ -9,6 +9,7 @@ import { SelectField } from '../../components/ui/SelectField';
 import { addBatch, fetchBatches, updateBatch, deleteBatch } from '../../store/slices/batchSlice';
 import { fetchCourses } from '../../store/slices/courseSlice';
 import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 export const BatchList = () => {
   const batches = useSelector(state => state.batches.list);
@@ -42,9 +43,9 @@ export const BatchList = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (editingBatch) {
-      dispatch(updateBatch({ 
-        id: editingBatch.id, 
-        data: { ...formData, students: editingBatch.students } 
+      dispatch(updateBatch({
+        id: editingBatch.id,
+        data: { ...formData, students: editingBatch.students }
       }));
     } else {
       dispatch(addBatch({ ...formData, students: 0 }));
@@ -54,8 +55,18 @@ export const BatchList = () => {
     setEditingBatch(null);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this batch?')) {
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this batch?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
       dispatch(deleteBatch(id));
     }
   };
@@ -78,29 +89,29 @@ export const BatchList = () => {
                 <Users size={24} />
               </div>
               <div className="flex items-center gap-2">
-                 <span className="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-500">ID: {batch.id}</span>
+                <span className="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-500">ID: {batch.id}</span>
               </div>
             </div>
-             <div className="absolute top-6 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
-                  onClick={() => openModal(batch)}
-                  className="p-1.5 bg-white rounded-full text-slate-400 hover:text-indigo-600 shadow-sm border border-slate-100"
-                  title="Edit"
-                >
-                  <Edit size={14} />
-                </button>
-                <button 
-                  onClick={() => handleDelete(batch.id)}
-                  className="p-1.5 bg-white rounded-full text-slate-400 hover:text-red-600 shadow-sm border border-slate-100"
-                  title="Delete"
-                >
-                  <Trash2 size={14} />
-                </button>
-             </div>
+            <div className="absolute top-6 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={() => openModal(batch)}
+                className="p-1.5 bg-white rounded-full text-slate-400 hover:text-indigo-600 shadow-sm border border-slate-100"
+                title="Edit"
+              >
+                <Edit size={14} />
+              </button>
+              <button
+                onClick={() => handleDelete(batch.id)}
+                className="p-1.5 bg-white rounded-full text-slate-400 hover:text-red-600 shadow-sm border border-slate-100"
+                title="Delete"
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
 
             <h3 className="font-bold text-slate-800 text-lg mb-1">{batch.name}</h3>
             <p className="text-sm text-slate-500 mb-4">{batch.course}</p>
-            
+
             <div className="space-y-2 text-sm text-slate-600 border-t border-slate-100 pt-4">
               <div className="flex items-center gap-2">
                 <Users size={16} className="text-slate-400" />
@@ -121,15 +132,15 @@ export const BatchList = () => {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingBatch ? "Edit Batch" : "Create New Batch"}>
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <InputField label="Batch Name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} placeholder="e.g., Class 10-A" />
-          <SelectField 
-            label="Course" 
-            value={formData.course} 
-            onChange={(e) => setFormData({...formData, course: e.target.value})} 
-            options={courses.data ? courses.data.map(c => ({ value: c.title, label: c.title })) : courses.map(c => ({ value: c.title, label: c.title }))} 
+          <InputField label="Batch Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="e.g., Class 10-A" />
+          <SelectField
+            label="Course"
+            value={formData.course}
+            onChange={(e) => setFormData({ ...formData, course: e.target.value })}
+            options={courses.data ? courses.data.map(c => ({ value: c.title, label: c.title })) : courses.map(c => ({ value: c.title, label: c.title }))}
           />
-          <InputField label="Tutor Name" value={formData.tutor} onChange={(e) => setFormData({...formData, tutor: e.target.value})} placeholder="e.g., John Doe" />
-          <InputField label="Start Date" type="date" value={formData.startDate} onChange={(e) => setFormData({...formData, startDate: e.target.value})} />
+          <InputField label="Tutor Name" value={formData.tutor} onChange={(e) => setFormData({ ...formData, tutor: e.target.value })} placeholder="e.g., John Doe" />
+          <InputField label="Start Date" type="date" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} />
           <div className="pt-4">
             <Button className="w-full">{editingBatch ? "Update Batch" : "Create Batch"}</Button>
           </div>

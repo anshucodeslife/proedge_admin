@@ -10,6 +10,7 @@ import { SelectField } from '../../components/ui/SelectField';
 import { FileUpload } from '../../components/ui/FileUpload';
 import { addCourse, fetchCourses, updateCourse, deleteCourse } from '../../store/slices/courseSlice';
 import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 export const CoursesList = () => {
   const { list: courses, loading } = useSelector(state => state.courses);
@@ -87,8 +88,18 @@ export const CoursesList = () => {
     setEditingCourse(null);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this course?')) {
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this course?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
       dispatch(deleteCourse(id));
     }
   };

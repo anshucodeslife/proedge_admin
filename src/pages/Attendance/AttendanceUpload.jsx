@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Upload, Calendar, CheckCircle, XCircle, AlertCircle, Download } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 const AttendanceUpload = () => {
     const [selectedDate, setSelectedDate] = useState('');
@@ -32,7 +33,7 @@ const AttendanceUpload = () => {
 
     const handleUpload = async () => {
         if (!selectedDate || parsedData.length === 0) {
-            alert('Please select a date and upload a file');
+            Swal.fire('Error', 'Please select a date and upload a file', 'error');
             return;
         }
 
@@ -46,7 +47,7 @@ const AttendanceUpload = () => {
             setUploadResults(response.data.data);
         } catch (error) {
             console.error('Upload error:', error);
-            alert('Failed to upload attendance');
+            Swal.fire('Error', 'Failed to upload attendance', 'error');
         } finally {
             setLoading(false);
         }
@@ -141,8 +142,8 @@ const AttendanceUpload = () => {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.student_id}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                                             <span className={`px-2 py-1 rounded-full text-xs ${row.attendance?.toLowerCase() === 'present' ? 'bg-green-100 text-green-800' :
-                                                    row.attendance?.toLowerCase() === 'absent' ? 'bg-red-100 text-red-800' :
-                                                        'bg-yellow-100 text-yellow-800'
+                                                row.attendance?.toLowerCase() === 'absent' ? 'bg-red-100 text-red-800' :
+                                                    'bg-yellow-100 text-yellow-800'
                                                 }`}>
                                                 {row.attendance}
                                             </span>

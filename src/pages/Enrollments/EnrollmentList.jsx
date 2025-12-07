@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Plus, Trash2, UserPlus } from 'lucide-react';
+import { Plus, Trash2, UserPlus, Loader2 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
@@ -15,10 +15,11 @@ import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
 
 export const EnrollmentList = () => {
-  const enrollments = useSelector(state => state.enrollments.list);
-  const students = useSelector(state => state.students.list);
-  const courses = useSelector(state => state.courses.list);
-  const batches = useSelector(state => state.batches.list);
+  const enrollments = useSelector(state => state.enrollments?.list || []);
+  const loading = useSelector(state => state.enrollments?.loading);
+  const students = useSelector(state => state.students?.list || []);
+  const courses = useSelector(state => state.courses?.list || []);
+  const batches = useSelector(state => state.batches?.list || []);
   const dispatch = useDispatch();
 
   React.useEffect(() => {
@@ -40,13 +41,14 @@ export const EnrollmentList = () => {
 
     if (student && course && batch) {
       dispatch(enrollStudent({
-        studentName: student.name,
-        courseName: course.title,
-        batchName: batch.name
+        userId: student.id,
+        courseId: course.id,
+        batchId: batch.id
       }));
-      toast.success('Student enrolled successfully');
       setIsModalOpen(false);
       setFormData({ studentId: '', courseId: '', batchId: '' });
+    } else {
+      toast.error('Please select all required fields');
     }
   };
 
@@ -66,6 +68,7 @@ export const EnrollmentList = () => {
     }
   };
 
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -81,38 +84,50 @@ export const EnrollmentList = () => {
 
       <Card>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-100 text-xs uppercase font-semibold text-slate-500">
-              <tr>
-                <th className="px-6 py-4">Student Name</th>
-                <th className="px-6 py-4">Course</th>
-                <th className="px-6 py-4">Batch</th>
-                <th className="px-6 py-4">Date</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {enrollments.map((enrollment) => (
-                <tr key={enrollment.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 font-medium text-slate-800">{enrollment.user?.fullName || 'Unknown Student'}</td>
-                  <td className="px-6 py-4">{enrollment.course?.title || 'Unknown Course'}</td>
-                  <td className="px-6 py-4">{enrollment.batch?.name || 'Self-Paced'}</td>
-                  <td className="px-6 py-4 text-slate-500">{new Date(enrollment.enrolledAt).toLocaleDateString()}</td>
-                  <td className="px-6 py-4"><Badge variant={enrollment.status === 'ACTIVE' ? 'success' : 'neutral'}>{enrollment.status}</Badge></td>
-                  <td className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => handleDelete(enrollment.id)}
-                      className="p-1 text-slate-400 hover:text-red-600 transition-colors"
-                      title="Unenroll"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
+          {loading ? (
+            <div className="p-8 text-center">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto text-orange-500" />
+              <p className="mt-2 text-slate-500">Loading enrollments...</p>
+            </div>
+          ) : enrollments.length === 0 ? (
+            <div className="p-8 text-center text-slate-500">
+              <p className="text-lg">No enrollments yet</p>
+              <p className="mt-1 text-sm">Click "New Enrollment" or "Assign Course" to add students.</p>
+            </div>
+          ) : (
+            <table className="w-full text-left text-sm text-slate-600">
+              <thead className="bg-slate-50 border-b border-slate-100 text-xs uppercase font-semibold text-slate-500">
+                <tr>
+                  <th className="px-6 py-4">Student Name</th>
+                  <th className="px-6 py-4">Course</th>
+                  <th className="px-6 py-4">Batch</th>
+                  <th className="px-6 py-4">Date</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {enrollments.map((enrollment) => (
+                  <tr key={enrollment.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4 font-medium text-slate-800">{enrollment.user?.fullName || 'Unknown Student'}</td>
+                    <td className="px-6 py-4">{enrollment.course?.title || 'Unknown Course'}</td>
+                    <td className="px-6 py-4">{enrollment.batch?.name || 'Self-Paced'}</td>
+                    <td className="px-6 py-4 text-slate-500">{enrollment.enrolledAt ? new Date(enrollment.enrolledAt).toLocaleDateString() : 'N/A'}</td>
+                    <td className="px-6 py-4"><Badge variant={enrollment.status === 'ACTIVE' ? 'success' : 'neutral'}>{enrollment.status}</Badge></td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        onClick={() => handleDelete(enrollment.id)}
+                        className="p-1 text-slate-400 hover:text-red-600 transition-colors"
+                        title="Unenroll"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </Card>
 

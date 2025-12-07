@@ -30,7 +30,7 @@ const menuItems = [
   // { path: '/logs', icon: ShieldAlert, label: 'Audit Logs' },
   // { path: '/admissions', icon: UserCheck, label: 'Batch 1 Admissions' },
   // { path: '/batches', icon: Users, label: 'Batches' },
-  // { path: '/enrollments', icon: UserCheck, label: 'Enrollments' },
+  { path: '/enrollments', icon: UserCheck, label: 'Enrollments' },
 
   { path: '/academics', icon: School, label: 'Modules & Lessons' },
   { path: '/attendance', icon: Calendar, label: 'Attendance' },

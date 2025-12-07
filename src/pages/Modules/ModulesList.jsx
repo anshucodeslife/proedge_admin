@@ -91,7 +91,7 @@ export const ModulesList = () => {
     if (lesson) {
       setLessonForm({
         title: lesson.title,
-        type: lesson.type,
+        type: lesson.type || 'Video', // Default to Video if type is not set
         durationSec: lesson.durationSec || '',
         order: lesson.order || '',
         videoUrl: lesson.videoUrl || ''
@@ -245,7 +245,6 @@ export const ModulesList = () => {
         </form>
       </Modal>
 
-      {/* Lesson Modal */}
       <Modal isOpen={isLessonModalOpen} onClose={() => setIsLessonModalOpen(false)} title={editingLesson ? "Edit Lesson" : "Add Lesson"}>
         <form className="space-y-4" onSubmit={handleLessonSubmit}>
           <InputField label="Lesson Title" value={lessonForm.title} onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })} placeholder="e.g., Introduction Video" />
@@ -261,13 +260,31 @@ export const ModulesList = () => {
           <InputField label="Duration (Seconds)" type="number" value={lessonForm.durationSec} onChange={(e) => setLessonForm({ ...lessonForm, durationSec: e.target.value })} placeholder="600" />
 
           {lessonForm.type === 'Video' && (
-            <FileUpload
-              label="Lesson Video"
-              folder="lessons/videos"
-              accept="video/*"
-              initialValue={lessonForm.videoUrl}
-              onUploadComplete={(key) => setLessonForm({ ...lessonForm, videoUrl: key })}
-            />
+            <div className="space-y-3">
+              {editingLesson && lessonForm.videoUrl && (
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-slate-700">Current Video</label>
+                  <div className="rounded-lg overflow-hidden bg-black aspect-video">
+                    <video
+                      controls
+                      className="w-full h-full"
+                      src={lessonForm.videoUrl.startsWith('http')
+                        ? lessonForm.videoUrl
+                        : `https://proedge-lms.s3.ap-south-1.amazonaws.com/${lessonForm.videoUrl}`}
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                </div>
+              )}
+              <FileUpload
+                label={editingLesson ? "Upload New Video (replaces current)" : "Lesson Video"}
+                folder="lessons/videos"
+                accept="video/*"
+                initialValue={editingLesson ? '' : lessonForm.videoUrl}
+                onUploadComplete={(key) => setLessonForm({ ...lessonForm, videoUrl: key })}
+              />
+            </div>
           )}
 
           {lessonForm.type !== 'Video' && (

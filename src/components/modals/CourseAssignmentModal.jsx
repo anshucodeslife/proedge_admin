@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, UserPlus } from 'lucide-react';
-import axios from 'axios';
+import api from '../../api/axios';
 import Swal from 'sweetalert2';
 
 const CourseAssignmentModal = ({ isOpen, onClose, onSuccess, courses = [] }) => {
@@ -19,10 +19,14 @@ const CourseAssignmentModal = ({ isOpen, onClose, onSuccess, courses = [] }) => 
 
     const fetchAllStudents = async () => {
         try {
-            const res = await axios.get('/admin/students');
-            const students = res.data.data || res.data || [];
-            setAllStudents(students);
-            setFilteredStudents(students);
+            // Fetch all students with a high limit to get everyone
+            const res = await api.get('/admin/students?limit=1000');
+            console.log('Students API response:', res.data);
+            // Response structure: { success: true, data: { students: [...], total, page, limit } }
+            const students = res.data.data?.students || res.data.students || res.data.data || [];
+            console.log('Extracted students:', students);
+            setAllStudents(Array.isArray(students) ? students : []);
+            setFilteredStudents(Array.isArray(students) ? students : []);
         } catch (error) {
             console.error('Error fetching students:', error);
             setAllStudents([]);
@@ -63,7 +67,7 @@ const CourseAssignmentModal = ({ isOpen, onClose, onSuccess, courses = [] }) => 
 
         setLoading(true);
         try {
-            const res = await axios.post(`/admin/courses/${selectedCourse}/assign`, {
+            const res = await api.post(`/admin/courses/${selectedCourse}/assign`, {
                 userIds: selectedStudents.map(s => s.id),
             });
 
@@ -120,7 +124,7 @@ const CourseAssignmentModal = ({ isOpen, onClose, onSuccess, courses = [] }) => 
                         type="text"
                         value={searchQuery}
                         onChange={(e) => handleSearchChange(e.target.value)}
-                        placeholder="Search students..."
+                        placeholder="Search by email, name, or student ID..."
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-2"
                     />
                 </div>
@@ -139,8 +143,8 @@ const CourseAssignmentModal = ({ isOpen, onClose, onSuccess, courses = [] }) => 
                                 >
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <div className="font-medium">{student.fullName || student.name}</div>
-                                            <div className="text-sm text-gray-600">{student.studentId} • {student.email}</div>
+                                            <div className="font-medium text-gray-900">{student.email}</div>
+                                            <div className="text-sm text-gray-600">{student.fullName || student.name} • {student.studentId}</div>
                                         </div>
                                         {isSelected && (
                                             <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">

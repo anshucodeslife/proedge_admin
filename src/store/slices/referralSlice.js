@@ -45,7 +45,7 @@ const referralSlice = createSlice({
             })
             .addCase(fetchReferrals.fulfilled, (state, action) => {
                 state.loading = false;
-                state.list = action.payload.referrals || [];
+                state.list = action.payload.data || [];
                 state.stats = action.payload.stats || null;
             })
             .addCase(fetchReferrals.rejected, (state, action) => {

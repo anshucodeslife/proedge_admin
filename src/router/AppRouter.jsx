@@ -6,7 +6,7 @@ import { Dashboard } from '../pages/Dashboard/Dashboard';
 import { StudentsList } from '../pages/Students/StudentsList';
 import { UsersList } from '../pages/Users/UsersList';
 import Enquiries from '../pages/Enquiries/Enquiries';
-import Logs from '../pages/Logs/Logs';
+import Logs from '../pages/Logs/Logs.jsx';
 import Referrals from '../pages/Referrals/Referrals';
 import Admissions from '../pages/Admissions/Admissions';
 import { CoursesList } from '../pages/Courses/CoursesList';

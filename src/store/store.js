@@ -16,6 +16,8 @@ import staffReducer from './slices/staffSlice';
 import parentReducer from './slices/parentSlice';
 import questionReducer from './slices/questionSlice';
 import dashboardReducer from './slices/dashboardSlice';
+import tutorReducer from './slices/tutorSlice';
+import userReducer from './slices/userSlice';
 
 export const store = configureStore({
   reducer: {
@@ -36,5 +38,8 @@ export const store = configureStore({
     parents: parentReducer,
     questions: questionReducer,
     dashboard: dashboardReducer,
+    tutors: tutorReducer,
+    users: userReducer,
   },
 });
+

@@ -20,9 +20,11 @@ export const AdminLayout = () => {
   const getTitle = () => {
     switch (location.pathname) {
       case '/': return 'Dashboard';
+      case '/users': return 'User Management';
       case '/staff': return 'Staff & Teachers';
       case '/parents': return 'Parents';
       case '/students': return 'Students';
+      case '/tutors': return 'Tutors';
       case '/academics': return 'Academic Structure';
       case '/courses': return 'Courses';
       case '/questions': return 'Question Bank';
@@ -38,7 +40,7 @@ export const AdminLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 font-sans overflow-hidden">
+    <div className="flex h-screen bg-brand-50 font-sans overflow-hidden">
       {isMobileOpen && (
         <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setMobileOpen(false)} />
       )}
@@ -53,7 +55,7 @@ export const AdminLayout = () => {
 
       <main className="flex-1 flex flex-col h-full overflow-hidden w-full">
         <Topbar title={getTitle()} setMobileOpen={setMobileOpen} />
-        <div className="flex-1 overflow-y-auto p-6 md:p-8">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>

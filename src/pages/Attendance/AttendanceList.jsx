@@ -178,16 +178,16 @@ export const AttendanceList = () => {
             />
           </div>
 
-          <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors shadow-sm text-gray-700">
+          <label className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-md shadow-orange-200 rounded-lg cursor-pointer transition-all duration-200 font-medium">
             <Upload className="w-4 h-4" />
-            <span className="text-sm font-medium">Upload CSV</span>
+            <span className="text-sm">Upload CSV</span>
             <input type="file" accept=".csv" className="hidden" onChange={handleFileUpload} />
           </label>
 
-          <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-2">
+          {/* <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-2">
             <CheckCircle className="w-4 h-4" />
             Mark Today
-          </button>
+          </button> */}
         </div>
       </div>
 

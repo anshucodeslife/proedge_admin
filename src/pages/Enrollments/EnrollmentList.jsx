@@ -73,11 +73,11 @@ export const EnrollmentList = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Enrollments</h2>
-          <p className="text-slate-500 text-sm">Manage student course enrollments</p>
+          <h2 className="text-2xl font-bold text-slate-800">Assigned Courses</h2>
+          <p className="text-slate-500 text-sm">Manage student course assignments</p>
         </div>
         <div className="flex gap-3">
-          <Button onClick={() => setIsAssignmentModalOpen(true)} icon={UserPlus} variant="secondary">Assign Course</Button>
+          <Button onClick={() => setIsAssignmentModalOpen(true)} icon={UserPlus} variant="primary">Assign Course</Button>
           {/* <Button onClick={() => setIsModalOpen(true)} icon={Plus}>New Enrollment</Button> */}
         </div>
       </div>

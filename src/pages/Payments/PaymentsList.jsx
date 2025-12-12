@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { DollarSign, CreditCard, CheckCircle, Clock } from 'lucide-react';
+import { IndianRupee, CreditCard, CheckCircle, Clock } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { fetchPayments } from '../../store/slices/paymentSlice';
@@ -36,7 +36,7 @@ export const PaymentsList = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Payments Management</h1>
         <div className="flex items-center gap-2 text-gray-600">
-          <DollarSign size={20} />
+          <IndianRupee size={20} />
           <span className="font-medium">
             Total: ₹{payments.reduce((sum, p) => sum + (p.amount || 0), 0).toLocaleString()}
           </span>

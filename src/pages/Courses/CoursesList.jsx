@@ -35,6 +35,7 @@ export const CoursesList = () => {
     access: '',
     thumbnail: '',
     description: '',
+    points: [],
     active: true,
     type: 'SUBJECT'
   });
@@ -67,6 +68,7 @@ export const CoursesList = () => {
       access: course.access || '',
       thumbnail: course.thumbnail || course.image || '',
       description: course.description || '',
+      points: course.points || [],
       active: course.active ?? true,
       type: 'SUBJECT' // Default or derive if needed
     });
@@ -78,7 +80,7 @@ export const CoursesList = () => {
     setFormData({
       title: '', slug: '', code: '', price: '', mrp: '', duration: '',
       lectures: '', projects: '', certificate: '', access: '',
-      thumbnail: '', description: '', active: true, type: 'SUBJECT'
+      thumbnail: '', description: '', points: [], active: true, type: 'SUBJECT'
     });
     setIsModalOpen(true);
   };
@@ -137,7 +139,7 @@ export const CoursesList = () => {
       </div>
 
       {/* Search & List */}
-      <Card>
+      <Card className="overflow-hidden">
         <div className="p-4 border-b border-slate-100">
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
@@ -152,7 +154,7 @@ export const CoursesList = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
+          <table className="w-full text-left text-sm text-slate-600 min-w-[800px]">
             <thead className="bg-slate-50 border-b border-slate-100 uppercase text-xs font-semibold text-slate-500">
               <tr>
                 <th className="px-6 py-4">Title</th>
@@ -266,6 +268,21 @@ export const CoursesList = () => {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Detailed course description..."
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Learning Points (one per line)</label>
+            <textarea
+              className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              rows={6}
+              value={Array.isArray(formData.points) ? formData.points.join('\n') : ''}
+              onChange={(e) => setFormData({
+                ...formData,
+                points: e.target.value.split('\n').filter(p => p.trim())
+              })}
+              placeholder="Understanding Power BI basics&#10;Data import & transformation&#10;Creating dashboards"
+            />
+            <p className="text-xs text-slate-500 mt-1">Enter each learning outcome on a new line</p>
           </div>
 
           <FileUpload

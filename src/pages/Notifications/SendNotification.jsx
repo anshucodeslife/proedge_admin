@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Send, Users, User, BookOpen, Mail, Bell } from 'lucide-react';
-import axios from 'axios';
+import api from '../../api/axios';
 import Swal from 'sweetalert2';
 
-const SendNotification = () => {
+const SendNotification = ({ onSuccess }) => { // Added onSuccess prop
     const [title, setTitle] = useState('');
     const [message, setMessage] = useState('');
     const [recipientType, setRecipientType] = useState('all'); // all, course, individual
@@ -22,8 +22,8 @@ const SendNotification = () => {
 
     const fetchCourses = async () => {
         try {
-            const res = await axios.get('/courses');
-            setCourses(res.data.data || []);
+            const res = await api.get('/courses');
+            setCourses(res.data.data?.courses || []);
         } catch (error) {
             console.error('Error fetching courses:', error);
         }
@@ -35,7 +35,7 @@ const SendNotification = () => {
             return;
         }
         try {
-            const res = await axios.get(`/admin/students/search?q=${query}`);
+            const res = await api.get(`/admin/students/search?q=${query}`);
             setStudents(res.data.data || []);
         } catch (error) {
             console.error('Error searching students:', error);
@@ -56,11 +56,11 @@ const SendNotification = () => {
                 userIds = selectedUsers;
             } else if (recipientType === 'course') {
                 // Fetch students enrolled in selected course
-                const res = await axios.get(`/enrollments?courseId=${selectedCourse}`);
+                const res = await api.get(`/enrollments?courseId=${selectedCourse}`);
                 userIds = res.data.data.map(e => e.userId);
             }
 
-            await axios.post('/notifications/send', {
+            await api.post('/notifications/send', {
                 title,
                 message,
                 type: sendEmail ? 'EMAIL' : 'IN_APP',
@@ -73,6 +73,7 @@ const SendNotification = () => {
             setMessage('');
             setSelectedUsers([]);
             setShowPreview(false);
+            if (onSuccess) onSuccess(); // Callback
         } catch (error) {
             console.error('Error sending notification:', error);
             Swal.fire('Error', 'Failed to send notification', 'error');
@@ -82,15 +83,12 @@ const SendNotification = () => {
     };
 
     return (
-        <div className="p-6">
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">Send Notification</h1>
-                <p className="text-gray-600 mt-1">Send notifications to students</p>
-            </div>
+        <div className=""> {/* Removed padding to fit in modal better */}
+            {/* Title section removed to not duplicate modal header if used there, or can keep it specific */}
 
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="space-y-6">
                 {/* Title */}
-                <div className="mb-4">
+                <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
                     <input
                         type="text"
@@ -102,7 +100,7 @@ const SendNotification = () => {
                 </div>
 
                 {/* Message */}
-                <div className="mb-4">
+                <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
                     <textarea
                         value={message}
@@ -114,7 +112,7 @@ const SendNotification = () => {
                 </div>
 
                 {/* Recipient Type */}
-                <div className="mb-4">
+                <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Recipients</label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <button
@@ -146,7 +144,7 @@ const SendNotification = () => {
 
                 {/* Course Selection */}
                 {recipientType === 'course' && (
-                    <div className="mb-4">
+                    <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Select Course</label>
                         <select
                             value={selectedCourse}
@@ -163,7 +161,7 @@ const SendNotification = () => {
 
                 {/* Individual Selection */}
                 {recipientType === 'individual' && (
-                    <div className="mb-4">
+                    <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Search Students</label>
                         <input
                             type="text"
@@ -202,7 +200,7 @@ const SendNotification = () => {
                 )}
 
                 {/* Send Email Option */}
-                <div className="mb-6">
+                <div>
                     <label className="flex items-center gap-2">
                         <input
                             type="checkbox"
@@ -216,17 +214,17 @@ const SendNotification = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-4">
+                <div className="flex gap-4 pt-4 border-t">
                     <button
                         onClick={() => setShowPreview(true)}
-                        className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                        className="flex-1 px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
                     >
                         Preview
                     </button>
                     <button
                         onClick={handleSend}
                         disabled={loading || !title || !message}
-                        className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
+                        className="flex-1 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         <Send className="w-4 h-4" />
                         {loading ? 'Sending...' : 'Send Notification'}
@@ -236,7 +234,7 @@ const SendNotification = () => {
 
             {/* Preview Modal */}
             {showPreview && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
                     <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
                         <h3 className="text-lg font-semibold mb-4">Preview</h3>
                         <div className="bg-gray-50 p-4 rounded-lg mb-4">

@@ -5,7 +5,7 @@ export const Logo = ({ className = "" }) => (
     <img src="/proedge_logo.png" alt="Proedge Learning" className="w-10 h-10 object-contain" />
     <div className="flex flex-col items-start leading-none">
       <span className="tracking-tight text-orange-500">Proedge</span>
-      <span className="tracking-tight text-slate-800">Learning</span>
+      <span className={`tracking-tight ${className.includes('text-white') ? 'text-white' : 'text-slate-800'}`}>Learning</span>
     </div>
   </div>
 );

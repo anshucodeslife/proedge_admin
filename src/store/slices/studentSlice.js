@@ -220,7 +220,10 @@ const studentSlice = createSlice({
       })
       // Delete Student
       .addCase(deleteStudent.fulfilled, (state, action) => {
-        state.list = state.list.filter(s => s.id !== action.payload);
+        const index = state.list.findIndex(s => s.id === action.payload);
+        if (index !== -1) {
+          state.list[index].status = 'INACTIVE';
+        }
       })
       // Update Status
       .addCase(updateStudentStatus.fulfilled, (state, action) => {

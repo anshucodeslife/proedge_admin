@@ -5,6 +5,7 @@ import { Search, Plus, Trash2, Copy, Percent, Users, Award, Eye, X, Edit2, Tag }
 import Swal from 'sweetalert2';
 import toast from 'react-hot-toast';
 import api from '../../api/axios';
+import { Button } from '../../components/ui/Button';
 
 const Referrals = () => {
     const dispatch = useDispatch();
@@ -95,9 +96,7 @@ const Referrals = () => {
                     <h1 className="text-2xl font-bold text-gray-800">Referral Management</h1>
                     <p className="text-gray-500 text-sm">Create and track referral codes</p>
                 </div>
-                <button onClick={() => setShowModal(true)} className="bg-[#00C08B] text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#00a074]">
-                    <Plus size={20} /> Create New Code
-                </button>
+                <Button onClick={() => setShowModal(true)} icon={Plus}>Create New Code</Button>
             </div>
 
             {/* Stats Cards */}

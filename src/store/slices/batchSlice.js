@@ -56,8 +56,21 @@ export const deleteBatch = createAsyncThunk(
   }
 );
 
+export const fetchBatchStudents = createAsyncThunk(
+  'batches/fetchBatchStudents',
+  async (batchId, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/lms/batches/${batchId}/students`);
+      return response.data.data || response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch batch students');
+    }
+  }
+);
+
 const initialState = {
   list: [],
+  currentBatchStudents: [], // Store viewed batch's students
   loading: false,
   error: null,
 };
@@ -86,6 +99,9 @@ const batchSlice = createSlice({
       })
       .addCase(deleteBatch.fulfilled, (state, action) => {
         state.list = state.list.filter(b => b.id !== action.payload);
+      })
+      .addCase(fetchBatchStudents.fulfilled, (state, action) => {
+        state.currentBatchStudents = action.payload; // payload is array of Enrollments with User
       });
   },
 });

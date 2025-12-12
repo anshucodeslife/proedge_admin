@@ -7,18 +7,22 @@ import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { InputField } from '../../components/ui/InputField';
 import { SelectField } from '../../components/ui/SelectField';
-import { fetchBatches, addBatch, updateBatch, deleteBatch } from '../../store/slices/batchSlice';
+import { fetchBatches, addBatch, updateBatch, deleteBatch, fetchBatchStudents } from '../../store/slices/batchSlice';
 import { fetchCourses } from '../../store/slices/courseSlice';
+import { fetchTutors } from '../../store/slices/tutorSlice';
 import Swal from 'sweetalert2';
 
 export const BatchesList = () => {
-  const batches = useSelector(state => state.batches.list);
+  const { list: batches, currentBatchStudents } = useSelector(state => state.batches);
   const courses = useSelector(state => state.courses.list);
+  const tutors = useSelector(state => state.tutors.list || []);
   const loading = useSelector(state => state.batches.loading);
   const dispatch = useDispatch();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
   const [editingBatch, setEditingBatch] = useState(null);
+  const [selectedBatchName, setSelectedBatchName] = useState('');
   const [formData, setFormData] = useState({
     name: '', courseId: '', tutorName: '', startDate: '', endDate: '', schedule: ''
   });
@@ -26,6 +30,7 @@ export const BatchesList = () => {
   useEffect(() => {
     dispatch(fetchBatches());
     dispatch(fetchCourses({ page: 1, limit: 100 }));
+    dispatch(fetchTutors());
   }, [dispatch]);
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -69,6 +74,12 @@ export const BatchesList = () => {
       await dispatch(deleteBatch(id));
       dispatch(fetchBatches());
     }
+  };
+
+  const handleViewStudents = (batch) => {
+    setSelectedBatchName(batch.name);
+    dispatch(fetchBatchStudents(batch.id));
+    setIsStudentModalOpen(true);
   };
 
   const closeModal = () => {
@@ -118,10 +129,14 @@ export const BatchesList = () => {
                       {batch.startDate && new Date(batch.startDate).toLocaleDateString()} - {batch.endDate && new Date(batch.endDate).toLocaleDateString()}
                     </td>
                     <td className="p-4">
-                      <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleViewStudents(batch)}
+                        className="flex items-center gap-1 hover:text-indigo-600 transition-colors"
+                        title="View Students"
+                      >
                         <Users size={16} className="text-gray-400" />
-                        <span>{batch._count?.enrollments || 0}</span>
-                      </div>
+                        <span className="font-medium underline decoration-dotted">{batch._count?.enrollments || 0}</span>
+                      </button>
                     </td>
                     <td className="p-4">
                       <div className="flex justify-end gap-2">
@@ -158,7 +173,14 @@ export const BatchesList = () => {
             options={courses.map(c => ({ value: c.id, label: c.title }))}
             required
           />
-          <InputField label="Tutor Name" name="tutorName" value={formData.tutorName} onChange={handleChange} required />
+          <SelectField
+            label="Tutor Name"
+            name="tutorName"
+            value={formData.tutorName}
+            onChange={handleChange}
+            options={tutors.map(t => ({ value: t.fullName, label: t.fullName }))}
+            required
+          />
           <div className="grid grid-cols-2 gap-4">
             <InputField label="Start Date" type="date" name="startDate" value={formData.startDate} onChange={handleChange} />
             <InputField label="End Date" type="date" name="endDate" value={formData.endDate} onChange={handleChange} />
@@ -169,6 +191,43 @@ export const BatchesList = () => {
             <Button type="submit">{editingBatch ? 'Update' : 'Create'} Batch</Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Student List Modal */}
+      <Modal isOpen={isStudentModalOpen} onClose={() => setIsStudentModalOpen(false)} title={`Students in ${selectedBatchName}`}>
+        <div className="overflow-x-auto max-h-[60vh]">
+          {currentBatchStudents.length === 0 ? (
+            <p className="text-center text-gray-500 py-8">No students assigned to this batch.</p>
+          ) : (
+            <table className="w-full text-sm text-left text-gray-500">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3">Student Name</th>
+                  <th className="px-4 py-3">Email</th>
+                  <th className="px-4 py-3">Phone</th>
+                  <th className="px-4 py-3">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentBatchStudents.map((enrollment) => (
+                  <tr key={enrollment.id} className="bg-white border-b hover:bg-gray-50">
+                    <td className="px-4 py-3 font-medium text-gray-900">{enrollment.user?.fullName}</td>
+                    <td className="px-4 py-3">{enrollment.user?.email}</td>
+                    <td className="px-4 py-3">{enrollment.user?.contact || 'N/A'}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 rounded text-xs ${enrollment.user?.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        {enrollment.user?.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          <div className="mt-4 flex justify-end">
+            <Button variant="outline" onClick={() => setIsStudentModalOpen(false)}>Close</Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

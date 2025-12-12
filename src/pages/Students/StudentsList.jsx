@@ -104,16 +104,30 @@ export const StudentsList = () => {
     try {
       if (editingStudent) {
         await dispatch(updateStudent({ id: editingStudent.id, data: formData })).unwrap();
-        toast.success('Student updated successfully');
+        // Toast handled in slice
       } else {
         await dispatch(addStudent({ ...formData, isPreApproved: true })).unwrap();
-        toast.success('Student registered successfully');
+        // Toast handled in slice
       }
       setIsModalOpen(false);
     } catch (error) {
-      toast.error('Operation failed: ' + (error.message || 'Unknown error'));
+      // Error toast handled in slice too usually, but let's check. 
+      // Slice has toast.error, but let's keep this catch for safety or consistency?
+      // Slice DOES have toast.error. So we can remove this too, or leave it locally if unwrap fails differently.
+      // But unwrap rejection payload is the message. 
+      // Let's remove the Success toast definitely.
     }
   };
+
+  const handleStatusChange = async (studentId, newStatus) => {
+    try {
+      await dispatch(updateStudent({ id: studentId, data: { status: newStatus } })).unwrap();
+      // Toast handled in slice
+    } catch (error) {
+      // handled in slice
+    }
+  };
+
 
   // Helper for consistent Select Input
   const SelectField = ({ label, value, onChange, options }) => (
@@ -157,6 +171,9 @@ export const StudentsList = () => {
     a.click();
   };
 
+  const activeStudents = filteredStudents.filter(s => s.status !== 'INACTIVE');
+  const deletedStudents = filteredStudents.filter(s => s.status === 'INACTIVE');
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -166,13 +183,13 @@ export const StudentsList = () => {
           <p className="text-slate-500 text-sm">Manage student admissions and profiles</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportCSV} icon={Download}>Export CSV</Button>
-          <Button onClick={handleCreate} icon={Plus}>Add Student</Button>
+          <Button variant="primary" onClick={handleExportCSV} icon={Download}>Export CSV</Button>
+          {/* <Button onClick={handleCreate} icon={Plus}>Add Student</Button> */}
         </div>
       </div>
 
-      {/* List */}
-      <Card>
+      {/* List - Active Students */}
+      <Card className="overflow-hidden">
         <div className="p-4 border-b border-slate-100">
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
@@ -186,22 +203,23 @@ export const StudentsList = () => {
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
+          <table className="w-full text-left text-sm text-slate-600 min-w-[1000px]">
             <thead className="bg-slate-50 border-b border-slate-100 uppercase text-xs font-semibold text-slate-500">
               <tr>
                 <th className="px-6 py-4">ID</th>
                 <th className="px-6 py-4">Name</th>
                 <th className="px-6 py-4">Course</th>
+                <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loading ? (
-                <tr><td colSpan="4" className="px-6 py-8 text-center">Loading...</td></tr>
-              ) : filteredStudents.length === 0 ? (
-                <tr><td colSpan="4" className="px-6 py-8 text-center">No students found.</td></tr>
+                <tr><td colSpan="5" className="px-6 py-8 text-center">Loading...</td></tr>
+              ) : activeStudents.length === 0 ? (
+                <tr><td colSpan="5" className="px-6 py-8 text-center">No active students found.</td></tr>
               ) : (
-                filteredStudents.map((student) => (
+                activeStudents.map((student) => (
                   <tr key={student.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4 font-mono text-xs text-slate-500">{student.studentId || '-'}</td>
                     <td className="px-6 py-4 font-medium text-slate-800">
@@ -215,10 +233,26 @@ export const StudentsList = () => {
                       </div>
                       <div className="text-xs text-slate-400">{student.email}</div>
                     </td>
-                    <td className="px-6 py-4">{student.courseName || '-'}</td>
+                    <td className="px-6 py-4">{student.courseName || student.enrollments?.[0]?.course?.title || '-'}</td>
+                    <td className="px-6 py-4">
+                      <select
+                        value={student.status || 'ACTIVE'}
+                        onChange={(e) => handleStatusChange(student.id, e.target.value)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border-0 outline-none cursor-pointer transition-all ${student.status === 'ACTIVE'
+                          ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                          : 'bg-red-100 text-red-700 hover:bg-red-200'
+                          }`}
+                      >
+                        <option value="ACTIVE">Active</option>
+                        <option value="INACTIVE">Inactive</option>
+                      </select>
+                    </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
-                        <button onClick={() => handleViewInvoice(student)} className="p-2 text-purple-600 hover:bg-purple-50 rounded" title="Invoice"><FileText size={18} /></button>
+                        {/* Check for invoice in nested enrollments */}
+                        {(student.enrollments?.[0]?.payments?.[0]?.invoice || student.invoiceId) && (
+                          <button onClick={() => handleViewInvoice(student)} className="p-2 text-purple-600 hover:bg-purple-50 rounded" title="Invoice"><FileText size={18} /></button>
+                        )}
                         <button onClick={() => handleEdit(student)} className="p-2 text-blue-600 hover:bg-blue-50 rounded" title="Edit"><Edit2 size={18} /></button>
                         <button onClick={() => handleView(student)} className="p-2 text-slate-600 hover:bg-slate-50 rounded" title="Details"><Eye size={18} /></button>
                         <button onClick={() => handleDelete(student.id)} className="p-2 text-red-600 hover:bg-red-50 rounded" title="Delete"><Trash2 size={18} /></button>
@@ -231,6 +265,50 @@ export const StudentsList = () => {
           </table>
         </div>
       </Card>
+
+      {/* Recently Deleted / Inactive Students */}
+      {deletedStudents.length > 0 && (
+        <div className="space-y-4">
+          <h3 className="text-xl font-bold text-slate-800">Recently Deleted</h3>
+          <Card>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-slate-600">
+                <thead className="bg-red-50 border-b border-red-100 uppercase text-xs font-semibold text-red-500">
+                  <tr>
+                    <th className="px-6 py-4">ID</th>
+                    <th className="px-6 py-4">Name</th>
+                    <th className="px-6 py-4">Course</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-red-50 bg-red-50/10">
+                  {deletedStudents.map((student) => (
+                    <tr key={student.id} className="hover:bg-red-50/30 transition-colors">
+                      <td className="px-6 py-4 font-mono text-xs text-slate-500">{student.studentId || '-'}</td>
+                      <td className="px-6 py-4 font-medium text-slate-800">
+                        <div>{student.fullName}</div>
+                        <div className="text-xs text-slate-400">{student.email}</div>
+                      </td>
+                      <td className="px-6 py-4">{student.courseName || student.enrollments?.[0]?.course?.title || '-'}</td>
+                      <td className="px-6 py-4">
+                        <span className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-100 text-red-700">
+                          Deleted
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" size="sm" onClick={() => handleStatusChange(student.id, 'ACTIVE')}>Restore</Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* Edit/Add Modal - Comprehensive */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingStudent ? "Edit Student" : "Register Student"}>
@@ -277,7 +355,7 @@ export const StudentsList = () => {
             <h3 className="font-semibold text-slate-800 mb-3">Course & Payment</h3>
             <div className="grid grid-cols-2 gap-4">
               <InputField label="Course Name" name="courseName" value={formData.courseName || ''} onChange={(e) => setFormData({ ...formData, courseName: e.target.value })} />
-              <InputField label="Total Fees" name="totalFees" type="number" value={formData.totalFees || ''} onChange={(e) => setFormData({ ...formData, totalFees: parseFloat(e.target.value) })} />
+              <InputField label="Total Fees (₹)" name="totalFees" type="number" value={formData.totalFees || ''} onChange={(e) => setFormData({ ...formData, totalFees: parseFloat(e.target.value) })} />
 
               <SelectField
                 label="Payment Mode"
@@ -394,7 +472,7 @@ export const StudentsList = () => {
               <div>
                 <h3 className="text-lg font-semibold border-b pb-2 mb-4">Course Info</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <div><p className="text-sm text-gray-500">Course</p><p>{selectedStudent.courseName || '-'}</p></div>
+                  <div><p className="text-sm text-gray-500">Course</p><p>{selectedStudent.courseName || selectedStudent.enrollments?.[0]?.course?.title || '-'}</p></div>
                   <div><p className="text-sm text-gray-500">Fees</p><p>₹{selectedStudent.totalFees}</p></div>
                   <div><p className="text-sm text-gray-500">Paid Fees</p><p>₹{selectedStudent.paidFees || 0}</p></div>
                   <div><p className="text-sm text-gray-500">Mode</p><p>{selectedStudent.paymentMode}</p></div>

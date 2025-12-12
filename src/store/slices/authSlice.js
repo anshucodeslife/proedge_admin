@@ -8,6 +8,13 @@ export const loginUser = createAsyncThunk(
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const response = await api.post('/auth/login', { email, password });
+      const userData = response.data.data?.user || response.data.user;
+      const role = userData?.role;
+
+      if (role !== 'ADMIN' && role !== 'SUPERADMIN') {
+        throw { response: { data: { message: 'Access Denied: Admin privileges required.' } } };
+      }
+
       const token = response.data.data?.token || response.data.token;
       localStorage.setItem('token', token);
       return response.data;

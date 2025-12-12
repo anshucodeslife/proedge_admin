@@ -10,8 +10,8 @@ import toast from 'react-hot-toast';
 export const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@proedge.com');
+  const [password, setPassword] = useState('admin123');
   const { loading, isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {

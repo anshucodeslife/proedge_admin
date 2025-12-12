@@ -3,6 +3,7 @@ import { Save, Lock, Mail, Globe, Bell, Trash2 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import Swal from 'sweetalert2';
 import api from '../../api/axios';
+import { Button } from '../../components/ui/Button';
 
 export const ProfileSettings = () => {
   const [loading, setLoading] = useState(true);
@@ -66,8 +67,8 @@ export const ProfileSettings = () => {
 
   const handleReset = async () => {
     const result = await Swal.fire({
-      title: 'Danger Zone: Reset Data?',
-      text: "This will DELETE ALL students, admissions, and logs. Cannot be undone!",
+      title: 'Danger Zone: Reset System?',
+      text: "This will DELETE ALL students, payments, and activity. Only Admin accounts will be preserved.",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
@@ -93,14 +94,13 @@ export const ProfileSettings = () => {
           <h2 className="text-2xl font-bold text-slate-800">System Settings</h2>
           <p className="text-slate-500 text-sm">Configure global application parameters</p>
         </div>
-        <button
+        <Button
           onClick={handleSubmit}
           disabled={saving}
-          className="bg-[#00C08B] hover:bg-[#00a074] text-white px-6 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium shadow-sm disabled:opacity-50"
+          icon={Save}
         >
-          <Save size={20} />
           {saving ? 'Saving...' : 'Save Changes'}
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-6">

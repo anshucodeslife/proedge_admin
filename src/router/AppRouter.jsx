@@ -4,10 +4,11 @@ import { AdminLayout } from '../layouts/AdminLayout';
 import { Login } from '../pages/Auth/Login';
 import { Dashboard } from '../pages/Dashboard/Dashboard';
 import { StudentsList } from '../pages/Students/StudentsList';
+import { UsersList } from '../pages/Users/UsersList';
 import Enquiries from '../pages/Enquiries/Enquiries';
 import Logs from '../pages/Logs/Logs';
 import Referrals from '../pages/Referrals/Referrals';
-import Batch1Admissions from '../pages/Admissions/Batch1Admissions';
+import Admissions from '../pages/Admissions/Admissions';
 import { CoursesList } from '../pages/Courses/CoursesList';
 import { ModulesList } from '../pages/Modules/ModulesList';
 import { BatchesList } from '../pages/Batches/BatchesList';
@@ -19,6 +20,7 @@ import { ProfileSettings } from '../pages/Settings/ProfileSettings';
 import { StaffList } from '../pages/Staff/StaffList';
 import { ParentsList } from '../pages/Parents/ParentsList';
 import { QuestionBank } from '../pages/Questions/QuestionBank';
+import { TutorsList } from '../pages/Tutors/TutorsList';
 
 export const AppRouter = () => {
   return (
@@ -26,11 +28,12 @@ export const AppRouter = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
+        <Route path="users" element={<UsersList />} />
         <Route path="students" element={<StudentsList />} />
         <Route path="enquiries" element={<Enquiries />} />
         <Route path="logs" element={<Logs />} />
         <Route path="referrals" element={<Referrals />} />
-        <Route path="admissions" element={<Batch1Admissions />} />
+        <Route path="admissions" element={<Admissions />} />
         <Route path="courses" element={<CoursesList />} />
         <Route path="academics" element={<ModulesList />} /> {/* Using Modules as Academics/Syllabus for now as per menu */}
         <Route path="batches" element={<BatchesList />} />
@@ -44,6 +47,7 @@ export const AppRouter = () => {
         <Route path="staff" element={<StaffList />} />
         <Route path="parents" element={<ParentsList />} />
         <Route path="questions" element={<QuestionBank />} />
+        <Route path="tutors" element={<TutorsList />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

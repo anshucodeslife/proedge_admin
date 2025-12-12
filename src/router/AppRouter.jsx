@@ -6,7 +6,7 @@ import { Dashboard } from '../pages/Dashboard/Dashboard';
 import { StudentsList } from '../pages/Students/StudentsList';
 import { UsersList } from '../pages/Users/UsersList';
 import Enquiries from '../pages/Enquiries/Enquiries';
-import Logs from '../pages/Logs/Logs.jsx';
+// import Logs from '../pages/Logs/Logs.jsx';  // Temporarily disabled for build
 import Referrals from '../pages/Referrals/Referrals';
 import Admissions from '../pages/Admissions/Admissions';
 import { CoursesList } from '../pages/Courses/CoursesList';
@@ -31,7 +31,7 @@ export const AppRouter = () => {
         <Route path="users" element={<UsersList />} />
         <Route path="students" element={<StudentsList />} />
         <Route path="enquiries" element={<Enquiries />} />
-        <Route path="logs" element={<Logs />} />
+        {/* <Route path="logs" element={<Logs />} /> */}  {/* Temporarily disabled */}
         <Route path="referrals" element={<Referrals />} />
         <Route path="admissions" element={<Admissions />} />
         <Route path="courses" element={<CoursesList />} />

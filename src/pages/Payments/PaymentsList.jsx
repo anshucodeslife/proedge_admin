@@ -1,23 +1,37 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { IndianRupee, CreditCard, CheckCircle, Clock } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
-import { fetchPayments } from '../../store/slices/paymentSlice';
+import { fetchPayments, updatePaymentStatus } from '../../store/slices/paymentSlice';
+import { toast } from 'react-hot-toast';
 
 export const PaymentsList = () => {
   const payments = useSelector(state => state.payments.transactions);
   const loading = useSelector(state => state.payments.loading);
   const dispatch = useDispatch();
+  const [updatingPaymentId, setUpdatingPaymentId] = useState(null);
 
   useEffect(() => {
     dispatch(fetchPayments());
   }, [dispatch]);
 
+  const handleStatusChange = async (paymentId, newStatus) => {
+    setUpdatingPaymentId(paymentId);
+    try {
+      await dispatch(updatePaymentStatus({ paymentId, status: newStatus })).unwrap();
+      toast.success('Payment status updated successfully');
+    } catch (error) {
+      toast.error(error || 'Failed to update payment status');
+    } finally {
+      setUpdatingPaymentId(null);
+    }
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
-      case 'COMPLETED': return 'success';
-      case 'PENDING': return 'warning';
+      case 'SUCCESS': return 'success';
+      case 'INITIATED': return 'warning';
       case 'FAILED': return 'danger';
       default: return 'neutral';
     }
@@ -25,8 +39,8 @@ export const PaymentsList = () => {
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'COMPLETED': return <CheckCircle size={16} className="text-green-500" />;
-      case 'PENDING': return <Clock size={16} className="text-yellow-500" />;
+      case 'SUCCESS': return <CheckCircle size={16} className="text-green-500" />;
+      case 'INITIATED': return <Clock size={16} className="text-yellow-500" />;
       default: return <CreditCard size={16} className="text-gray-500" />;
     }
   };
@@ -77,15 +91,23 @@ export const PaymentsList = () => {
                       <span className="font-bold text-green-600">₹{payment.amount?.toLocaleString()}</span>
                     </td>
                     <td className="p-4">
-                      <div className="flex items-center gap-2">
-                        {getStatusIcon(payment.status)}
-                        <Badge variant={getStatusColor(payment.status)}>
-                          {payment.status}
-                        </Badge>
-                      </div>
+                      <select
+                        value={payment.status}
+                        onChange={(e) => handleStatusChange(payment.id, e.target.value)}
+                        disabled={updatingPaymentId === payment.id}
+                        className={`px-3 py-1 rounded-full text-sm font-medium border-2 ${payment.status === 'SUCCESS' ? 'bg-green-50 border-green-200 text-green-700' :
+                            payment.status === 'INITIATED' ? 'bg-yellow-50 border-yellow-200 text-yellow-700' :
+                              'bg-red-50 border-red-200 text-red-700'
+                          } ${updatingPaymentId === payment.id ? 'opacity-50 cursor-wait' : 'cursor-pointer hover:opacity-80'}`}
+                      >
+                        <option value="INITIATED">INITIATED</option>
+                        <option value="SUCCESS">SUCCESS</option>
+                        <option value="FAILED">FAILED</option>
+                        <option value="REFUNDED">REFUNDED</option>
+                      </select>
                     </td>
                     <td className="p-4">
-                      <Badge variant="neutral" className="uppercase">{payment.provider || payment.paymentMethod || 'Online'}</Badge>
+                      <Badge variant="neutral" className="uppercase">{payment.provider || payment.paymentMethod || 'razorpay'}</Badge>
                     </td>
                     <td className="p-4 text-sm text-gray-600">
                       {new Date(payment.createdAt).toLocaleDateString()}

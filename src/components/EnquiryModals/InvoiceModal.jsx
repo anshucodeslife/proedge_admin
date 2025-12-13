@@ -81,45 +81,51 @@ export default function InvoiceModal({ isOpen, onClose, studentData }) {
                                 <tr>
                                     <td className="p-3 border-b border-gray-200">
                                         <p className="font-semibold">{studentData.courseName}</p>
-                                        <p className="text-sm text-gray-500">Batch: {studentData.batchTiming}</p>
+                                        <p className="text-sm text-gray-500">Batch: {studentData.batchTiming || 'Not Assigned'}</p>
                                     </td>
                                     <td className="p-3 border-b border-gray-200 text-right font-medium">
-                                        {studentData.originalFees || studentData.totalFees}
+                                        ₹{(studentData.originalFees || studentData.totalFees)?.toLocaleString('en-IN')}
                                     </td>
                                 </tr>
-                                {studentData.referralAmount > 0 && (
+                                {studentData.referralCode && studentData.referralAmount > 0 && (
                                     <tr>
-                                        <td className="p-3 border-b border-gray-200 text-green-600">Referral Discount</td>
-                                        <td className="p-3 border-b border-gray-200 text-right text-green-600">
-                                            - {studentData.referralAmount}
+                                        <td className="p-3 border-b border-gray-200 text-green-600">
+                                            <p className="font-medium">Referral Discount</p>
+                                            <p className="text-xs text-gray-500">Code: {studentData.referralCode}</p>
+                                        </td>
+                                        <td className="p-3 border-b border-gray-200 text-right text-green-600 font-medium">
+                                            - ₹{studentData.referralAmount?.toLocaleString('en-IN')}
                                         </td>
                                     </tr>
                                 )}
                             </tbody>
                             <tfoot>
                                 <tr className="bg-gray-50">
-                                    <td className="p-3 font-bold text-right border-t border-gray-300">Total Payable:</td>
-                                    <td className="p-3 font-bold text-right border-t border-gray-300 text-xl text-[#0a214d]">
-                                        ₹{studentData.totalFees}
+                                    <td className="p-3 font-bold text-right border-t-2 border-gray-300">Total Payable:</td>
+                                    <td className="p-3 font-bold text-right border-t-2 border-gray-300 text-xl text-[#0a214d]">
+                                        ₹{studentData.totalFees?.toLocaleString('en-IN')}
                                     </td>
                                 </tr>
+                                {(studentData.paymentOption === 'Payment in Advance' && studentData.installment1Amount) && (
+                                    <tr className="bg-green-50">
+                                        <td className="p-3 font-semibold text-right text-green-700">Advance Paid:</td>
+                                        <td className="p-3 font-semibold text-right text-green-700 text-lg">
+                                            ₹{parseFloat(studentData.installment1Amount)?.toLocaleString('en-IN')}
+                                        </td>
+                                    </tr>
+                                )}
+                                {(studentData.paymentOption === 'Payment in Advance' && studentData.installment1Amount) && (
+                                    <tr className="bg-blue-50">
+                                        <td className="p-3 font-semibold text-right text-blue-700">Remaining Balance:</td>
+                                        <td className="p-3 font-semibold text-right text-blue-700 text-lg">
+                                            ₹{(parseFloat(studentData.totalFees || 0) - parseFloat(studentData.installment1Amount || 0)).toLocaleString('en-IN')}
+                                        </td>
+                                    </tr>
+                                )}
                             </tfoot>
                         </table>
 
                         {/* Payment Plan Details */}
-                        {studentData.paymentOption === 'Payment in Advance' && studentData.advancePaymentAmount && (
-                            <div className="mb-8 p-4 bg-green-50 rounded-lg border border-green-100">
-                                <h3 className="font-bold text-[#0a214d] mb-3">Payment in Advance</h3>
-                                <div className="text-sm">
-                                    <p className="text-gray-600 mb-2">Advance amount paid to secure enrollment:</p>
-                                    <p className="text-2xl font-bold text-green-600">₹{studentData.advancePaymentAmount}</p>
-                                    <p className="text-xs text-gray-500 mt-2">
-                                        Remaining Balance: ₹{(studentData.totalFees - studentData.advancePaymentAmount).toFixed(2)}
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-
                         {studentData.paymentOption === 'Pay in Installments' && (
                             <div className="mb-8 p-4 bg-blue-50 rounded-lg border border-blue-100">
                                 <h3 className="font-bold text-[#0a214d] mb-3">Payment Plan (Installments)</h3>
@@ -167,7 +173,7 @@ export default function InvoiceModal({ isOpen, onClose, studentData }) {
                         Print Invoice
                     </button>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

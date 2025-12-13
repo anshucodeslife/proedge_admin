@@ -57,12 +57,14 @@ const Admissions = () => {
     };
 
     const handleEnroll = (admission) => {
+        console.log('Enrolling student:', admission);
         setEnrollingStudent(admission);
         setModalType('admission');
         setShowEnrollModal(true);
     };
 
     const openEditModal = (admission) => {
+        console.log('Opening edit modal for:', admission);
         setNewStudentData(admission);
         setModalType('edit');
         setShowEnrollModal(true);
@@ -246,17 +248,7 @@ const Admissions = () => {
                     <InvoiceModal
                         isOpen={showInvoiceModal}
                         onClose={() => setShowInvoiceModal(false)}
-                        invoiceData={{
-                            id: newStudentData.invoiceId,
-                            invoiceNo: newStudentData.invoiceNo,
-                            date: newStudentData.invoiceDate,
-                            studentName: newStudentData.fullName,
-                            studentEmail: newStudentData.email,
-                            courseName: newStudentData.courseName,
-                            amount: newStudentData.totalFees,
-                            paymentId: newStudentData.paymentId,
-                            status: 'Paid'
-                        }}
+                        studentData={newStudentData}
                     />
                 )}
             </div>

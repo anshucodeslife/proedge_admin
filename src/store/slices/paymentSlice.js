@@ -18,11 +18,37 @@ export const addTransaction = createAsyncThunk(
   'payments/addTransaction',
   async (paymentData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/payments', paymentData); // Assuming a general create payment endpoint manually? Or /payments/order?
+      const response = await api.post('/payments', paymentData);
       toast.success('Payment recorded successfully');
       return response.data.data || response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to record payment');
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const updatePaymentStatus = createAsyncThunk(
+  'payments/updateStatus',
+  async ({ paymentId, status }, { rejectWithValue }) => {
+    try {
+      const response = await api.patch(`/payments/${paymentId}/status`, { status });
+      return { paymentId, status };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update payment status');
+    }
+  }
+);
+
+export const deleteTransaction = createAsyncThunk(
+  'payments/deleteTransaction',
+  async (id, { rejectWithValue }) => {
+    try {
+      await api.delete(`/payments/${id}`);
+      toast.success('Transaction deleted successfully');
+      return id;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete transaction');
       return rejectWithValue(error.response?.data?.message);
     }
   }
@@ -57,25 +83,19 @@ const paymentSlice = createSlice({
       .addCase(addTransaction.fulfilled, (state, action) => {
         state.transactions.unshift(action.payload);
       })
+      // Update Payment Status
+      .addCase(updatePaymentStatus.fulfilled, (state, action) => {
+        const { paymentId, status } = action.payload;
+        const paymentIndex = state.transactions.findIndex(p => p.id === paymentId);
+        if (paymentIndex !== -1) {
+          state.transactions[paymentIndex].status = status;
+        }
+      })
       // Delete Transaction
       .addCase(deleteTransaction.fulfilled, (state, action) => {
         state.transactions = state.transactions.filter(t => t.id !== action.payload);
       });
   },
 });
-
-export const deleteTransaction = createAsyncThunk(
-  'payments/deleteTransaction',
-  async (id, { rejectWithValue }) => {
-    try {
-      await api.delete(`/payments/${id}`);
-      toast.success('Transaction deleted/voided successfully');
-      return id;
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to delete transaction');
-      return rejectWithValue(error.response?.data?.message);
-    }
-  }
-);
 
 export default paymentSlice.reducer;

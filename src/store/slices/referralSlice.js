@@ -12,7 +12,7 @@ export const fetchReferrals = createAsyncThunk('referrals/fetchReferrals', async
 
 export const createReferral = createAsyncThunk('referrals/createReferral', async (data, { rejectWithValue }) => {
     try {
-        const response = await api.post('/referrals/generate', data);
+        const response = await api.post('/referrals', data);
         return response.data.data;
     } catch (error) {
         return rejectWithValue(error.response?.data?.message || 'Failed to create referral');

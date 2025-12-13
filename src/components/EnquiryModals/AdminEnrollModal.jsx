@@ -10,7 +10,7 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
     const [courses, setCourses] = useState([]);
     const [batches, setBatches] = useState([]);
     const [isCourseDropdownOpen, setIsCourseDropdownOpen] = useState(false);
-    
+
     // Initial State
     const initialFormData = {
         fullName: '',
@@ -26,10 +26,10 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
         classYear: '',
         educationLevel: '',
         board: '',
-        
+
         courseName: '', // Comma separated for display/multi-select logic
         batchId: '', // For Batch Selection
-        
+
         totalFees: '',
         paymentMode: 'Cash',
         paymentOption: 'Pay in Full',
@@ -51,10 +51,11 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
     }, [isOpen]);
 
     useEffect(() => {
-        if (studentData) {
+        if (studentData && isOpen) {
+            console.log('Student Data Received:', studentData);
             setFormData(prev => ({
-                ...prev,
-                ...studentData, // Spread all existing matching keys
+                ...initialFormData, // Start with defaults
+                // Then override with actual student data
                 fullName: studentData.fullName || '',
                 email: studentData.email || '',
                 contact: studentData.contact || '',
@@ -67,10 +68,9 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
                 classYear: studentData.classYear || '',
                 educationLevel: studentData.educationLevel || '',
                 board: studentData.board || '',
-                
+
                 courseName: studentData.courseName || studentData.preferredCourses || '',
-                // batchId might need to be resolved if studentData has it
-                batchId: studentData.batchId || '', 
+                batchId: studentData.batchId || '',
 
                 totalFees: studentData.totalFees || '',
                 paymentMode: studentData.paymentMode || 'Cash',
@@ -82,7 +82,7 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
                 installment3Amount: studentData.installment3Amount || '',
                 installment3Date: studentData.installment3Date?.split('T')[0] || '',
             }));
-        } else {
+        } else if (!studentData) {
             setFormData(initialFormData);
         }
     }, [studentData, isOpen]);
@@ -160,21 +160,21 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
         }
 
         try {
-             if (type === 'edit') {
-                 // Edit Mode - Update Student/Admission
-                 // Assuming updateAdmission updates the student profile
-                 await dispatch(updateAdmission({ ...formData, userId: studentData.userId || studentData.id })).unwrap();
-                 
-                 // If batch changed, update enrollment batch?
-                 // The backend 'updateStudent' doesn't handle batch. 
-                 // We might need a separate call if batchId changed.
-                 // For now, simpler implementation: Just update profile fields via updateAdmission.
-                 
-                 toast.success('Student details updated successfully');
-                 onSuccess && onSuccess(formData);
-                 onClose();
-             } else {
-                 // Enroll Mode
+            if (type === 'edit') {
+                // Edit Mode - Update Student/Admission
+                // Assuming updateAdmission updates the student profile
+                await dispatch(updateAdmission({ ...formData, userId: studentData.userId || studentData.id })).unwrap();
+
+                // If batch changed, update enrollment batch?
+                // The backend 'updateStudent' doesn't handle batch. 
+                // We might need a separate call if batchId changed.
+                // For now, simpler implementation: Just update profile fields via updateAdmission.
+
+                toast.success('Student details updated successfully');
+                onSuccess && onSuccess(formData);
+                onClose();
+            } else {
+                // Enroll Mode
                 const endpoint = type === 'enquiry'
                     ? `/admissions/enquiry/${studentData.id}/enroll`
                     : `/admissions/${studentData.id}/enroll`;
@@ -188,7 +188,7 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
                 } else {
                     toast.error(res.data.error || 'Enrollment failed');
                 }
-             }
+            }
         } catch (error) {
             console.error('Operation error:', error);
             toast.error(error.message || 'Operation failed');
@@ -210,7 +210,7 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-                    
+
                     {/* --- Personal Information --- */}
                     <div className="space-y-4">
                         <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Personal Details</h3>
@@ -231,7 +231,7 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
                                 <label className="block text-sm font-medium text-gray-700 mb-1">DOB</label>
                                 <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="w-full p-2 border rounded-lg" />
                             </div>
-                             <div>
+                            <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
                                 <select name="gender" value={formData.gender} onChange={handleChange} className="w-full p-2 border rounded-lg">
                                     <option value="">Select</option>
@@ -242,19 +242,19 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
                             </div>
                         </div>
 
-                         <div className="grid grid-cols-2 gap-4">
-                             <div className="col-span-2">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                                 <textarea name="address" value={formData.address} onChange={handleChange} className="w-full p-2 border rounded-lg" rows="2" />
-                             </div>
-                         </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* --- Parent & Academic --- */}
                     <div className="space-y-4">
                         <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Parent & Academic</h3>
                         <div className="grid grid-cols-2 gap-4">
-                             <div>
+                            <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Parent Name</label>
                                 <input type="text" name="parentName" value={formData.parentName} onChange={handleChange} className="w-full p-2 border rounded-lg" />
                             </div>
@@ -262,7 +262,7 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Parent Contact</label>
                                 <input type="text" name="parentContact" value={formData.parentContact} onChange={handleChange} className="w-full p-2 border rounded-lg" />
                             </div>
-                             <div>
+                            <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">School/College</label>
                                 <input type="text" name="currentSchool" value={formData.currentSchool} onChange={handleChange} className="w-full p-2 border rounded-lg" />
                             </div>
@@ -280,10 +280,10 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
                     </div>
 
                     {/* --- Course & Batch --- */}
-                     <div className="space-y-4 md:col-span-2">
-                         <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Course & Batch</h3>
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                             <div className="relative">
+                    <div className="space-y-4 md:col-span-2">
+                        <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Course & Batch</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="relative">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Course(s)</label>
                                 <div className="w-full p-2 border border-gray-200 rounded-lg cursor-pointer bg-white flex justify-between items-center" onClick={() => setIsCourseDropdownOpen(!isCourseDropdownOpen)}>
                                     <span className="truncate">{formData.courseName || 'Select Courses'}</span>
@@ -301,7 +301,7 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
                                 )}
                             </div>
 
-                             <div>
+                            <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Assign Batch</label>
                                 <select name="batchId" value={formData.batchId} onChange={handleChange} className="w-full p-2 border rounded-lg">
                                     <option value="">Select Batch</option>
@@ -310,13 +310,13 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
                                     ))}
                                 </select>
                             </div>
-                         </div>
-                     </div>
+                        </div>
+                    </div>
 
 
                     {/* --- Payment Details --- */}
                     <div className="space-y-4 md:col-span-2">
-                         <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Payment Details</h3>
+                        <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Payment Details</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Total Fees (₹)</label>
@@ -331,7 +331,7 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
                                     <option value="Bank Transfer">Bank Transfer</option>
                                 </select>
                             </div>
-                            
+
                             <div className="col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Payment Option</label>
                                 <div className="flex gap-4">

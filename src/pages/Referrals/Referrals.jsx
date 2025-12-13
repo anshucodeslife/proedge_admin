@@ -12,7 +12,7 @@ const Referrals = () => {
     const { list: referrals, stats, loading } = useSelector((state) => state.referrals);
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
-    const [formData, setFormData] = useState({ code: '', discount: '', maxUses: '', expiryDate: '' });
+    const [formData, setFormData] = useState({ code: '', discount: '' });
 
     // New state for details modal
     const [selectedReferral, setSelectedReferral] = useState(null);
@@ -52,7 +52,7 @@ const Referrals = () => {
         try {
             await dispatch(createReferral(formData)).unwrap();
             setShowModal(false);
-            setFormData({ code: '', discount: '', maxUses: '', expiryDate: '' });
+            setFormData({ code: '', discount: '' });
             toast.success('Referral code created successfully');
         } catch (error) {
             toast.error(error || 'Failed to create referral');
@@ -163,7 +163,7 @@ const Referrals = () => {
                                 <tr key={ref.id} className="hover:bg-gray-50">
                                     <td className="p-4 font-mono font-medium text-purple-600">{ref.code}</td>
                                     <td className="p-4 font-bold text-gray-700">{ref.discount}%</td>
-                                    <td className="p-4 text-gray-700">{ref._count?.batch1admissions || 0}</td>
+                                    <td className="p-4 text-gray-700">{ref._count?.usages || 0}</td>
                                     <td className="p-4 text-gray-700 font-medium">₹{ref.totalDiscount || 0}</td>
                                     <td className="p-4"><span className={`px-2 py-1 rounded bg-green-100 text-green-700 text-xs`}>Active</span></td>
                                     <td className="p-4 text-right">
@@ -191,18 +191,8 @@ const Referrals = () => {
                                 <input required type="text" value={formData.code} onChange={e => setFormData({ ...formData, code: e.target.value.toUpperCase() })} className="w-full p-2 border rounded" placeholder="e.g. SUMMER50" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1">Discount Amount (₹)</label>
-                                <input required type="number" value={formData.discount} onChange={e => setFormData({ ...formData, discount: e.target.value })} className="w-full p-2 border rounded" placeholder="e.g. 500" />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Max Uses</label>
-                                    <input type="number" value={formData.maxUses} onChange={e => setFormData({ ...formData, maxUses: e.target.value })} className="w-full p-2 border rounded" placeholder="Optional" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Expiry Date</label>
-                                    <input required type="date" value={formData.expiryDate} onChange={e => setFormData({ ...formData, expiryDate: e.target.value })} className="w-full p-2 border rounded" />
-                                </div>
+                                <label className="block text-sm font-medium mb-1">Discount Percentage (%)</label>
+                                <input required type="number" min="0" max="100" step="0.01" value={formData.discount} onChange={e => setFormData({ ...formData, discount: e.target.value })} className="w-full p-2 border rounded" placeholder="e.g. 10" />
                             </div>
                             <div className="flex justify-end gap-3 mt-6">
                                 <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 border rounded hover:bg-gray-50">Cancel</button>
@@ -237,7 +227,7 @@ const Referrals = () => {
                                     </div>
                                     <div>
                                         <h3 className="text-xs font-medium text-gray-500 mb-1">Usage</h3>
-                                        <p className="text-gray-800 font-bold">{selectedReferral._count?.batch1admissions || 0}</p>
+                                        <p className="text-gray-800 font-bold">{selectedReferral._count?.usages || 0}</p>
                                     </div>
                                     <div>
                                         <h3 className="text-xs font-medium text-gray-500 mb-1">Total Discount</h3>

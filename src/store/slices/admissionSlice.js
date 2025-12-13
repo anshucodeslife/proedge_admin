@@ -66,17 +66,50 @@ const admissionSlice = createSlice({
                     .map(e => ({
                         id: e.id,
                         userId: e.userId,
+                        batchId: e.batchId,
                         createdAt: e.enrolledAt,
                         orderId: e.payments?.[0]?.orderId || 'N/A', // Assuming first payment
+
+                        // Personal Details
                         fullName: e.user?.fullName,
                         email: e.user?.email,
                         contact: e.user?.contact,
-                        address: e.user?.address, // Added
-                        batchTiming: e.user?.batchTiming, // Added
-                        originalFees: e.user?.originalFees, // Added
-                        referralAmount: e.user?.referralAmount || 0, // Added
+                        dob: e.user?.dob,
+                        gender: e.user?.gender,
+                        address: e.user?.address,
+
+                        // Parent Details
+                        parentName: e.user?.parentName,
+                        parentContact: e.user?.parentContact,
+
+                        // Academic Details
+                        currentSchool: e.user?.currentSchool,
+                        classYear: e.user?.classYear,
+                        educationLevel: e.user?.educationLevel,
+                        board: e.user?.board,
+
+                        // Course & Batch
                         courseName: e.course?.title,
-                        totalFees: e.payments?.[0]?.amount || 0,
+                        batchTiming: e.user?.batchTiming,
+
+                        // Payment Details
+                        totalFees: e.payments?.[0]?.amount || e.user?.totalFees || 0,
+                        originalFees: e.user?.originalFees,
+                        paymentMode: e.payments?.[0]?.mode || 'Cash',
+                        paymentOption: e.user?.paymentOption || 'Pay in Full',
+                        advanceAmount: e.user?.advanceAmount,
+                        referralCode: e.user?.referralCode,
+                        referralAmount: e.user?.referralAmount || 0,
+
+                        // Installment Details
+                        installment1Amount: e.user?.installment1Amount,
+                        installment1Date: e.user?.installment1Date,
+                        installment2Amount: e.user?.installment2Amount,
+                        installment2Date: e.user?.installment2Date,
+                        installment3Amount: e.user?.installment3Amount,
+                        installment3Date: e.user?.installment3Date,
+
+                        // Status & Invoice
                         status: e.status,
                         invoiceId: e.payments?.[0]?.invoice?.id,
                         invoiceNo: e.payments?.[0]?.invoice?.invoiceNo,

@@ -201,8 +201,8 @@ const Admissions = () => {
                                                         </button>
                                                     ) : (
                                                         <>
-                                                            {/* Invoice Button */}
-                                                            {ad.invoiceId && (
+                                                            {/* Invoice Button - Show for all ACTIVE enrollments */}
+                                                            {ad.status === 'ACTIVE' && (
                                                                 <button onClick={() => {
                                                                     setNewStudentData(ad);
                                                                     setShowInvoiceModal(true);

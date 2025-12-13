@@ -291,12 +291,17 @@ const AdminEnrollModal = ({ isOpen, onClose, studentData, type, onSuccess }) => 
                                 </div>
                                 {isCourseDropdownOpen && (
                                     <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                                        {courses.map(course => (
-                                            <div key={course.id} className="flex items-center p-2 hover:bg-gray-50 cursor-pointer" onClick={() => toggleCourse(course.title, course.price)}>
-                                                <input type="checkbox" checked={selectedCoursesList.includes(course.title)} readOnly className="mr-2" />
-                                                <span className="text-sm text-gray-700">{course.title} (₹{course.price})</span>
-                                            </div>
-                                        ))}
+                                        {Array.isArray(courses) && courses.length > 0 ? courses.map(course => {
+                                            const selectedCourses = formData.courseName ? formData.courseName.split(',').map(c => c.trim()) : [];
+                                            return (
+                                                <div key={course.id} className="flex items-center p-2 hover:bg-gray-50 cursor-pointer" onClick={() => toggleCourse(course.title, course.price)}>
+                                                    <input type="checkbox" checked={selectedCourses.includes(course.title)} readOnly className="mr-2" />
+                                                    <span className="text-sm text-gray-700">{course.title} (₹{course.price})</span>
+                                                </div>
+                                            );
+                                        }) : (
+                                            <div className="p-2 text-sm text-gray-500 text-center">No courses available</div>
+                                        )}
                                     </div>
                                 )}
                             </div>

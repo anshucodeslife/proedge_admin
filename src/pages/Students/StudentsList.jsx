@@ -69,7 +69,31 @@ export const StudentsList = () => {
 
   const handleEdit = (student) => {
     setEditingStudent(student);
-    setFormData({ ...student }); // Clone data
+    // Map all data properly including nested fields
+    setFormData({
+      ...student,
+      // Ensure course name is mapped (might be in enrollments)
+      courseName: student.courseName || student.enrollments?.[0]?.course?.title || '',
+      // Ensure all payment fields are present
+      totalFees: student.totalFees || 0,
+      originalFees: student.originalFees || null,
+      paymentMode: student.paymentMode || '',
+      paymentOption: student.paymentOption || 'Pay in Full',
+      referralCode: student.referralCode || '',
+      referralAmount: student.referralAmount || 0,
+      advanceAmount: student.advanceAmount || null,
+      referenceNo: student.referenceNo || '',
+      // Installments
+      installment1Amount: student.installment1Amount || '',
+      installment1Date: student.installment1Date || '',
+      installment1Paid: student.installment1Paid || false,
+      installment2Amount: student.installment2Amount || '',
+      installment2Date: student.installment2Date || '',
+      installment2Paid: student.installment2Paid || false,
+      installment3Amount: student.installment3Amount || '',
+      installment3Date: student.installment3Date || '',
+      installment3Paid: student.installment3Paid || false,
+    });
     setIsModalOpen(true);
   };
 
@@ -249,8 +273,8 @@ export const StudentsList = () => {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
-                        {/* Check for invoice in nested enrollments */}
-                        {(student.enrollments?.[0]?.payments?.[0]?.invoice || student.invoiceId) && (
+                        {/* Invoice - Show for all Active students */}
+                        {student.status === 'ACTIVE' && (
                           <button onClick={() => handleViewInvoice(student)} className="p-2 text-purple-600 hover:bg-purple-50 rounded" title="Invoice"><FileText size={18} /></button>
                         )}
                         <button onClick={() => handleEdit(student)} className="p-2 text-blue-600 hover:bg-blue-50 rounded" title="Edit"><Edit2 size={18} /></button>
